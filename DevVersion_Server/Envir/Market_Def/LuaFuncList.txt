@@ -1,0 +1,103 @@
+; 获取装备剑锋等级 附魔功能
+get_daohun_lv
+
+; 获得字符串MD5值
+get_str_md5
+
+; 获取行会人数
+get_guild_humcount
+
+;拼接POST数据为JOSN字符串 GETPOSTDATA 参数1
+get_post_data
+
+; 时间加减计算 date_calc 时间 (+/-) 秒 S$返回的时间
+date_calc
+
+; 便捷运算赋值
+var_check
+
+; 检查字符串在键值对中排名多少
+list_check
+
+; 扩展命令，自动判断不是货币，调用不同命令给与
+give_ex
+
+; 扩展命令，自动判断不是货币，调用不同命令收走
+take_ex
+
+; 连续赋值命令
+mov_ex
+
+; 检查一个整数的指定位运算真假并进行赋值
+; -- var_check_bit 整数 位数 真赋值 假赋值 变量
+var_check_bit
+
+; 检车一个字符串是否包含指定字符串，并赋值
+; var_check_has 字符串1 字符串2 包含赋值 不包含赋值 赋值的变量
+var_check_has
+
+; 检查一个整数返回位运算为真的数量
+; -- var_check_bit_count 整数 变量
+var_check_bit_count
+
+; 检查一个整数，返回给到对比数里最大的（智能对检测数字）
+; var_check_num 整数 对比数（2,15,965,1231） 对应变量(N1,N2,N3,N4) 匹配赋值 不匹配赋值
+var_check_num
+
+; 绑定自定义属性
+abil_ex_bind
+
+; 修改自定义属性
+abil_ex_change
+; 清理自定义属性
+abil_ex_clear
+
+; 测试接口
+lua_run_func
+lua_run_func1
+lua_run_func2
+
+; 检查是否有称号，执行赋值
+; check_title 称号名称 有赋值 没有赋值 变量
+check_title
+
+
+
+
+; 初始化队伍管理类
+teamManager_init
+
+; 创建队伍
+teamManager_create
+
+; 获取队伍对象
+teamManager_getTeam
+
+; 清除队伍对象
+teamManager_removeTeam
+
+; 初始化队伍类
+team_Init
+
+; 获取自身队伍对象
+team_GetObj
+
+; 添加成员
+Team_addMember
+
+; 删除成员
+team_removeMember
+
+; 读取队伍变量
+team_getVariable
+
+; 设置队伍变量
+team_setVariable
+
+
+
+
+;==============================================cookie 新开发接口
+
+; 后台信息打印
+;cc_print

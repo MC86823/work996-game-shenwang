@@ -1,0 +1,5906 @@
+(@@InPutInteger @@InPutString @@useitemname @@OffLineMsg @@dealgold @ArmRemoveStone @PlayOffLine @medrug @storage @buy @sell @getback)
+;世界频道喊话
+#INCLUDE 版本常量.ini
+
+; 点击NPC触发，打开NPC触发
+[@ClickNPC]
+#IF
+NOT EQUAL <$GAMEID> 1
+#ACT
+BREAK
+
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+SENDMSG 6 NPCID:<$PARAM1>
+
+; GOTO跳转
+#IF
+LARGE <$GetTypeBRow(cfg_NPC脚本路径,0,<$PARAM1>)> -1
+NOT EQUAL <$cfg_NPC脚本路径(<$GetTypeBRow(cfg_NPC脚本路径,0,<$PARAM1>)>_1)> 0
+#ACT
+GOTO <$cfg_NPC脚本路径(<$GetTypeBRow(cfg_NPC脚本路径,0,<$PARAM1>)>_1)>
+BREAK
+
+; 向前端发送消息
+#IF
+LARGE <$GetTypeBRow(cfg_NPC脚本路径,0,<$PARAM1>)> -1
+NOT EQUAL <$cfg_NPC脚本路径(<$GetTypeBRow(cfg_NPC脚本路径,0,<$PARAM1>)>_2)> 0
+#ACT
+SENDCUSTMSG <$cfg_NPC脚本路径(<$GetTypeBRow(cfg_NPC脚本路径,0,<$PARAM1>)>_2)> <$cfg_NPC脚本路径(<$GetTypeBRow(cfg_NPC脚本路径,0,<$PARAM1>)>_3)>
+BREAK
+
+[@FindPathBegin]
+
+ 
+#act
+MAPMOVE <$MAP> <$ToPointX> <$ToPointY>
+[@狂暴QF]
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+SENDMSG 9 狂暴
+
+
+; BUFF增加、更新、删除触发 buffId:<$param1>_buff组：<$param2>_触发类型：<$param3> 1增加 4删除
+[@BuffChange]
+; 增加删除BUFF的时候刷新爆率
+#IF
+LARGE <$PARAM1> 60000
+SMALL <$PARAM1> 90000
+#ACT
+DELAYGOTO 100 @属性刷新EX
+
+; 吸血BUFF删除后给冷却
+#IF
+EQUAL <$PARAM3> 4
+EQUAL <$PARAM2> 60011
+#ACT
+ADDBUFF 60010 <$cfg_渡劫吸血配置(<$STR(U37)>_4)>
+BREAK
+
+; 新增 瘟疫BUFF后附带绿毒效果
+#IF
+EQUAL <$PARAM3> 1
+EQUAL <$PARAM1> 90000
+#ACT
+MAKEPOSION 0 10 10
+
+
+; 组队触发
+[@StartGroup]
+
+
+[@STARTMYSHOP]
+#IF
+#ACT
+FORBIDMYSHOP
+STOP
+BREAK
+
+#IF
+NOT INSAFEZONE
+#ACT
+FORBIDMYSHOP
+SENDMSG 9 此区域无法摆摊
+BREAK
+
+
+; 沙巴克铁匠打开赋值
+[@OPENLAYER510]
+#IF
+CHECKLEVELEX ? 1
+#ACT
+MOV N$武器强化 1
+BREAK
+; 沙巴克铁匠关闭赋值
+[@CLOSELAYER510]
+#IF
+CHECKLEVELEX ? 1
+#ACT
+MOV N$武器强化 0
+BREAK
+
+
+; 锻造面板处理
+[@OpenLayer447311]
+#IF
+CHECKLEVELEX ? 1
+#ACT
+MOV N$打开锻造面板 1
+BREAK
+
+; SENDMSG 6 面板打开
+; 锻造面板处理
+[@CloseLayer447311]
+#IF
+CHECKLEVELEX ? 1
+#ACT
+MOV S$提示信息 
+MOV S$幸运选择 
+MOV N$幸运IDX1 0
+MOV N$幸运IDX2 0
+MOV N$幸运IDX3 0
+MOV N$幸运IDX4 0
+MOV N$打开锻造面板 0
+BREAK
+
+[@CloseLayer46433]
+#IF
+CHECK [44] 1
+#ACT
+#CALL [\主界面基础按钮\密码进入游戏.txt] @密码进入游戏
+
+
+; 客户端确认领取转区——消息：447——<$CUSTMSGPARAM>：校验key——<$PARAM1>：转区金额
+[@Message_447]
+#IF
+#ACT
+MOV N$转区充值数据_POST <$CUSTMSGPARAM>
+
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+SENDMSG 6 <$CUSTMSGPARAM>
+BREAK
+
+[@Message_448]
+#IF
+#ACT
+MOV N$测试充值数据_POST <$CUSTMSGPARAM>
+
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+SENDMSG 6 <$CUSTMSGPARAM>
+BREAK
+
+[@Message_449]
+#IF
+#ACT
+MOV A60 <$CUSTMSGPARAM>
+
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+SENDMSG 6 A60:<$STR(A60)>
+SENDMSG 6 A61:<$STR(A61)>
+BREAK
+
+[@Message_1110]
+#IF
+#ACT
+SENDMSG 9 <$CUSTMSGPARAM>,<$PARAM1>,<$PARAM2>,<$PARAM3>
+BREAK
+
+
+; 外部GM操作接口——消息：9999——<$CUSTMSGPARAM>：校验key——<$PARAM1>：操作代码——<$PARAM2>：操作参数——<$PARAM3>：附加参数
+[@Message_9999]
+#IF
+#ACT
+BREAK
+
+
+
+
+[@OpenLayer9527]
+#IF
+#ACT
+MOV N$LOOKID 9527
+BREAK
+
+
+[@CloseLayer9527]
+#IF
+#ACT
+MOV N$LOOKID 0
+BREAK
+
+[@更改周奖励]
+#IF
+#ACT
+ADDSTRVALUE T13 <$STR(S$更改怪物)> 1
+BREAK
+
+[@UserCmd9]
+#IF
+#ACT
+; 计算巡查密码
+FORMULATION <$YEAR>*<$MONTH>*<$DAY>*888+44731 N$巡查密码
+
+
+; @cqcq ddd1 *key2 玩家名字3 金额4 主播5 *清理6
+; （补发真实充值，用于直播间启动，最大398）
+#IF
+EQUAL <$PARAM(1)> SXH
+#ACT
+GOTO @补发渠道充值
+BREAK
+
+#IF
+CHECKLEVELEX ? 1
+#ACT
+get_post_data S$上报数据 {"gcode":"<$PARAM(1)>|<$PARAM(2)>|<$PARAM(3)>|<$PARAM(4)>|<$PARAM(5)>|<$PARAM(6)>","gvalue":"0","desc":"直接执行"}
+HTTPPOST http://211.149.241.27:4473/api/api996/gm_log 0 <$STR(S$上报数据)>
+
+; @996m2 周奖励a 玩丶而已 ◇◇◇远古赤月·山海恶魔◇◇◇
+#IF
+EQUAL <$PARAM(1)> 周奖励a
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+SETHUMVAR <$PARAM(2)> S$更改怪物 <$PARAM(3)>
+<$PARAM(2)>.GOTO @更改周奖励
+SENDMSG 9 已更新[<$PARAM(2)>]周奖励【<$PARAM(3)>】为已完成
+BREAK
+
+#IF
+EQUAL <$PARAM(1)> <$GAMEID>
+EQUAL <$PARAM(2)> 每周清理
+CHECK_HUM_ONLINE <$PARAM(3)> 1
+#ACT
+SETHUMVAR <$PARAM(3)> U58 0
+SENDMSG 9 [<$PARAM(3)>]已重置周奖励、周末狂欢（重启生效）
+BREAK
+
+; @CODE CHECKBOSS 地图编号 怪物名称
+#IF
+EQUAL <$PARAM(1)> CHECKBOSS 
+#ACT
+FindMapMonster <$PARAM(2)> <$PARAM(3)> S$查询结果 1
+SENDMSG 6 <$STR(S$查询结果)>
+MESSAGEBOX <$STR(S$查询结果)>
+BREAK
+
+; @996m2 绝世神兵q 分过后的
+#IF
+EQUAL <$PARAM(1)> 绝世神兵q
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+<$PARAM(2)>.MailGIVE 绝世神兵[限时] 1
+<$PARAM(2)>.SendMail 3214 铁匠的礼物 恭喜你武器首次尝试+7，无论成功失败相信都是一种挑战。赠送一把三红BUFF武器，你拿去试试。
+SENDMSG 9 已补发玩家[<$PARAM(2)>]绝世神兵*1
+BREAK
+
+; @996m2 战力排序x
+; @996m2 等级排序x
+; @996m2 爆率排序x
+; @996m2 刀魂排序x
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 战力排序x
+#ACT
+ADDSTRVALUE A35 战力刷新 0
+DELAYGOTO 10 @战力排名立即刷新
+SENDMSG 9 <$PARAM(1)>完成
+BREAK
+
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 等级排序x
+#ACT
+ADDSTRVALUE A35 等级刷新 0
+DELAYGOTO 10 @等级排名立即刷新
+SENDMSG 9 <$PARAM(1)>完成
+BREAK
+
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 爆率排序x
+#ACT
+ADDSTRVALUE A35 爆率刷新 0
+DELAYGOTO 10 @爆率排名立即刷新
+SENDMSG 9 <$PARAM(1)>完成
+BREAK
+
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 刀魂排序x
+#ACT
+ADDSTRVALUE A35 刀魂刷新 0
+DELAYGOTO 10 @刀魂排名立即刷新
+SENDMSG 9 <$PARAM(1)>完成
+BREAK
+
+#IF
+EQUAL <$PARAM(1)> 删除行会x4
+#ACT
+GMEXECUTE DelGuild <$PARAM(2)>
+SENDMSG 9 行会[<$PARAM(2)>]删除完成
+BREAK
+
+; @996m2 排行榜开关x 1
+#IF
+EQUAL <$PARAM(1)> 排行榜开关x
+#ACT
+MOV G43 <$PARAM(2)>
+sendmsg 9 排行榜刷新状态：<$STR(G43)>||0为正常刷新，1为关闭刷新
+BREAK
+
+; @996m2 激活冠名ABS 北凉王丶洛落  1000
+#IF
+EQUAL <$PARAM(1)> 激活冠名ABS
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+SETHUMVAR <$PARAM(2)> U0 <$PARAM(3)>
+SENDMSG 9 【<$PARAM(2)>】已激活冠名
+BREAK
+
+; @996m2 GETVAR 分过后的 T13
+#IF
+EQUAL <$PARAM(1)> GETVAR
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+SETHUMVAR <$PARAM(2)> S$GETVAR <$PARAM(3)>
+GETHUMVAR <$PARAM(2)> S$GETVAR <$STR(<$STR(S$GETVAR)>)>
+MESSAGEBOX 查询<$PARAM(3)>:<$STR(S$GETVAR)>
+BREAK
+
+; @996m2 SETVAR 分过后的 U100 32
+#IF
+EQUAL <$PARAM(1)> SETVAR
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+SETHUMVAR <$PARAM(2)> <$PARAM(3)> <$PARAM(4)>
+SENDMSG 9 【<$PARAM(2)>】变量：<$PARAM(3)>为<$PARAM(4)>
+BREAK
+
+; @996m2 开通战令x2023 玩名字吧
+#IF
+EQUAL <$PARAM(1)> 开通战令x2023
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+<$PARAM(2)>.ADDSTRVALUE T35 开通高级奖励 1
+SENDMSG 9 [<$PARAM(2)>]已开通高级战令
+BREAK
+
+
+
+#IF
+EQUAL <$PARAM(1)> 清理战力目标领取
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+SETHUMVAR <$PARAM(2)> U29 0
+SENDMSG 9 【<$PARAM(2)>】已清理战力目标领取
+BREAK
+
+; @996m2 神兵447 君踏桃花归
+#IF
+EQUAL <$PARAM(1)> 神兵447
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+<$PARAM(2)>.MAILGIVE 绝世神兵[限时] 1
+<$PARAM(2)>.SENDMAIL 3214 铁匠的礼物 恭喜你武器首次尝试+7，无论成功失败相信都是一种挑战。赠送一把三红BUFF武器，你拿去试试。
+SENDMSG 9 已为玩家[<$PARAM(2)>]补发绝世神兵到邮件
+BREAK
+
+
+; @996m2 6015 开通直购礼包 玩家名字
+#IF
+EQUAL <$PARAM(1)> <$GAMEID>
+EQUAL <$PARAM(2)> 开通直购礼包
+CHECK_HUM_ONLINE <$PARAM(3)> 1
+#ACT
+SETHUMVAR <$PARAM(3)> T19 1
+SENDMSG 9 [<$PARAM(3)>]已开通高级BOSS通行证
+BREAK
+
+
+#IF
+EQUAL <$PARAM(1)> 修改限制密码
+#ACT
+MOV A26 <$PARAM(2)>
+MESSAGEBOX 本区限制密码已修改为：<$STR(A26)>
+BREAK
+
+; @996m2 开启调试aaaaaa
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 开启调试aaaaaa
+#ACT
+MOV A71 开启
+SENDMSG 9 开启测试服调试工具
+BREAK
+
+; @996m2 关闭调试bbbbbb
+#IF
+EQUAL <$PARAM(1)> 关闭调试bbbbbb
+#ACT
+MOV A71 关闭
+SENDMSG 9 关闭调试工具
+BREAK
+
+
+
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 密码进入123
+#ACT
+MOV G1 <$PARAM(2)>
+SENDMSG 9 <$STR(G1)>,0为关闭，1为开启
+BREAK
+
+; <$PARAM(2)>=0 全服 =1 自己
+; @996m2 清理自定义变量 刀魂数 0
+; VAR Integer HUMAN 战斗力
+; VAR Integer HUMAN 等级数
+; VAR Integer HUMAN 爆率数
+; VAR Integer HUMAN 刀魂数
+
+#IF
+EQUAL <$PARAM(1)> 清理自定义变量
+#ACT
+ClearHumCustVar <$PARAM(2)> <$PARAM(3)>
+SENDMSG 9 已清理[<$PARAM(2)>]<$PARAM(3)>
+BREAK
+
+
+#IF
+EQUAL <$PARAM(1)> 清理BUFF
+#ACT
+DELBUFF <$PARAM(2)>
+SENDMSG 9 已删除BUFF：<$PARAM(2)>
+BREAK
+
+#IF
+EQUAL <$PARAM(1)> 添加BUFF
+#ACT
+ADDBUFF <$PARAM(2)> <$PARAM(3)>
+SENDMSG 9 已添加BUFF：<$PARAM(2)>，<$PARAM(3)>秒
+BREAK
+
+; @CODE 查看生肖洗练
+#IF
+EQUAL <$PARAM(1)> 查看生肖洗练
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+GetHumVar <$PARAM(2)> S$洗练详情 <$STR(T28)>
+MESSAGEBOX <$STR(S$洗练详情)>
+BREAK
+
+
+; @CODE 生肖五行次数清理 玩家名字
+#IF
+EQUAL <$PARAM(1)> 生肖五行次数清理
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+<$PARAM(2)>.MOV T28 0
+SENDMSG 9 <$PARAM(2)>生肖五行次数已清理
+BREAK
+
+
+; @CODE 设置帝王令 玩家名字 普通天数 高级天数
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 设置帝王令
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+<$PARAM(2)>.MOV J27 0
+<$PARAM(2)>.MOV U18 <$PARAM(3)>
+<$PARAM(2)>.MOV U19 <$PARAM(4)>
+<$PARAM(2)>.MOV T1 <$PARAM(5)>
+SENDMSG 9 <$PARAM(2)>设置帝王令:<$PARAM(5)>
+BREAK
+
+; @CODE 清理五行 玩家名字 装备位置 （0是衣服 1是武器）
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> 清理五行
+CHECK_HUM_ONLINE <$PARAM(2)> 1
+#ACT
+SETHUMVAR <$PARAM(2)> S$清理位置 <$PARAM(3)>
+<$PARAM(2)>.GOTO @清理装备五行
+SENDMSG 9 <$PARAM(2)>执行清理五行位置：<$PARAM(3)>
+BREAK
+
+; @CODE 武器强化修复 强化等级(1-7) BUFF1 BUFF2 BUFF3 BUFF4（强化等级小于7则没有BUFF）
+; @996m2 武器强化修复 2
+; @996m2 武器强化修复 7 魔法转换2 道术转换3 重伤1 巅峰3
+#IF
+EQUAL <$PARAM(1)> 武器强化修复
+#ACT
+MOV N$CHECK 1
+GOTO @调整自身武器强化BUFF
+BREAK
+
+
+#IF
+ISADMIN
+EQUAL <$PARAM(1)> CCCC
+#ACT
+MOV G40 10
+SENDMSG 9 SET.G40=10
+BREAK
+
+
+; @CODE 加入行会 密码 行会名字 角色名字
+#IF
+EQUAL <$PARAM(1)> 加入行会
+CHECK_HUM_ONLINE <$PARAM(4)> 1
+#ACT
+ADDGUILDMEMBER <$PARAM(3)> <$PARAM(4)>
+SENDMSG 9 【<$PARAM(4)>】加入行会【<$PARAM(3)>】
+BREAK
+
+#IF
+EQUAL <$PARAM(1)> csv
+#ACT
+#CALL [\CSV\加载CSV配置文件到内存.txt] @加载CSV配置
+BREAK
+
+
+#IF
+#ACT
+GETSTRVALUE <$STR(A60)> password S$password
+; SENDMSG 6 <$STR(S$password)>
+
+#IF
+EQUAL <$PARAM(1)> <$STR(S$password)>
+CheckStringlength <$STR(S$password)> > 4
+#ACT
+#Call [悬浮按钮\通区测试.txt] @通区测试
+BREAK
+
+
+#IF
+EQUAL <$PARAM(1)> SXH<$STR(N$巡查密码)>
+#ACT
+CHANGEMODE 1 1
+CHANGEMODE 2 1
+CHANGEMODE 3 1
+SENDMSG 9 已进入巡查模式，请勿干扰玩家正常游戏
+BREAK
+
+[@清理装备五行]
+#IF
+#ACT
+CHANGEITEMADDVALUE <$STR(S$清理位置)> 40 = 0
+CHANGEITEMADDVALUE <$STR(S$清理位置)> 41 = 0
+CHANGEITEMADDVALUE <$STR(S$清理位置)> 42 = 0
+CHANGEITEMADDVALUE <$STR(S$清理位置)> 43 = 0
+CHANGEITEMADDVALUE <$STR(S$清理位置)> 44 = 0
+CHANGECUSTOMITEMTEXT <$STR(S$清理位置)> -1 0
+CHANGECUSTOMITEMVALUE <$STR(S$清理位置)> 0 = 0 0
+CHANGECUSTOMITEMVALUE <$STR(S$清理位置)> 1 = 0 0
+CHANGECUSTOMITEMVALUE <$STR(S$清理位置)> 2 = 0 0
+CHANGECUSTOMITEMVALUE <$STR(S$清理位置)> 3 = 0 0
+
+
+; @CODE 强化BUFF 强化等级 BUFF1 BUFF2 BUFF3 （强化等级小于7则没有BUFF）
+; @996m2 武器强化修复 7 道术转换3 魔法转换3 重伤3 巅峰6 （强化等级小于7则没有BUFF）
+[@调整自身武器强化BUFF]
+#IF
+NOT EQUAL N$CHECK 1
+#ACT
+BREAK
+
+#IF
+EQUAL <$WEAPON>
+#ACT
+BREAK
+
+#IF
+#ACT
+MOV N$CHECK 0
+SENDMSG 9 武器BUFF调整完成
+
+GetDBItemFieldValue <$WEAPON> NeedLevel N$WEAPONLEVEL
+
+#IF
+SMALL N$WEAPONLEVEL 100
+#ACT
+FORMULATION <$PARAM(2)>*30 N$修复属性
+#ELSEACT
+FORMULATION (<$PARAM(2)>*<$PARAM(2)>*10+(<$STR(N$WEAPONLEVEL)>-100+1)*(<$PARAM(2)>*10))*1.5 N$修复属性
+
+
+#IF
+LARGE <$PARAM(2)> 0
+#ACT
+ChangeItemUpgradeCount 1 = <$PARAM(2)>
+CHANGECUSTOMITEMTEXT 1 [强化属性]\<$cfg_强化祭品概率(<$PARAM(2)>_13)> 1
+CHANGECUSTOMITEMTEXTCOLOR 1 70 1
+
+CHANGECUSTOMITEMABIL 1 0 0 250 1
+CHANGECUSTOMITEMABIL 1 1 0 254 1
+CHANGECUSTOMITEMABIL 1 2 0 253 1
+
+CHANGECUSTOMITEMABIL 1 0 1 4 1
+CHANGECUSTOMITEMABIL 1 1 1 6 1
+CHANGECUSTOMITEMABIL 1 2 1 8 1
+
+CHANGECUSTOMITEMABIL 1 0 2 31 1
+CHANGECUSTOMITEMABIL 1 1 2 32 1
+CHANGECUSTOMITEMABIL 1 2 2 33 1
+
+CHANGECUSTOMITEMABIL 1 0 3 0 1
+CHANGECUSTOMITEMABIL 1 1 3 0 1
+CHANGECUSTOMITEMABIL 1 2 3 0 1
+
+CHANGECUSTOMITEMABIL 1 0 4 0 1
+CHANGECUSTOMITEMABIL 1 1 4 1 1
+CHANGECUSTOMITEMABIL 1 2 4 2 1
+
+CHANGECUSTOMITEMVALUE 1 0 = <$STR(N$修复属性)> 1
+CHANGECUSTOMITEMVALUE 1 1 = <$STR(N$修复属性)> 1
+CHANGECUSTOMITEMVALUE 1 2 = <$STR(N$修复属性)> 1
+
+#IF
+LARGE <$PARAM(2)> 6
+NOT EQUAL <$PARAM(3)>
+#ACT
+GETDBITEMFIELDVALUE <$PARAM(3)> idx N$BUFFIDX
+DRILLHOLE 1 0 1
+SOCKETABLEITEM 1 0 <$STR(N$BUFFIDX)>
+#ELSEACT
+DRILLHOLE 1 0 0
+
+#IF
+LARGE <$PARAM(2)> 6
+NOT EQUAL <$PARAM(4)>
+#ACT
+GETDBITEMFIELDVALUE <$PARAM(4)> idx N$BUFFIDX
+DRILLHOLE 1 1 1
+SOCKETABLEITEM 1 1 <$STR(N$BUFFIDX)>
+#ELSEACT
+DRILLHOLE 1 1 0
+
+#IF
+LARGE <$PARAM(2)> 6
+NOT EQUAL <$PARAM(5)>
+#ACT
+GETDBITEMFIELDVALUE <$PARAM(5)> idx N$BUFFIDX
+DRILLHOLE 1 2 1
+SOCKETABLEITEM 1 2 <$STR(N$BUFFIDX)>
+#ELSEACT
+DRILLHOLE 1 2 0
+
+#IF
+LARGE <$PARAM(2)> 6
+NOT EQUAL <$PARAM(6)>
+#ACT
+GETDBITEMFIELDVALUE <$PARAM(6)> idx N$BUFFIDX
+DRILLHOLE 1 3 1
+SOCKETABLEITEM 1 3 <$STR(N$BUFFIDX)>
+#ELSEACT
+DRILLHOLE 1 3 0
+
+
+; @cqcq0 ddd1 *key2 玩家名字3 金额4 主播5 *清理6
+[@补发渠道充值]
+#OR
+EQUAL <$PARAM(2)>
+EQUAL <$PARAM(3)>
+EQUAL <$PARAM(4)>
+EQUAL <$PARAM(5)>
+#ACT
+SENDMSG 9 参数错误
+BREAK
+
+#IF
+<$PARAM(3)>.CHECKONLINE
+#ELSEACT
+SENDMSG 9 【<$PARAM(3)>】不在线
+BREAK
+
+#IF
+LARGE <$PARAM(4)> 398
+#ACT
+SENDMSG 9 超过补发限额398
+BREAK
+
+
+#IF
+#ACT
+MOV A1 <$PARAM(3)>
+DIV N$DDD <$UTCNOW8> 60
+MOV N$MINUTE 8
+INC N$MINUTE <$MINUTE>
+DIV N$DDD <$STR(N$MINUTE)>
+
+
+#IF
+NOT EQUAL N$DDD <$PARAM(2)>
+#ACT
+SENDMSG 9 秘钥：<$PARAM(2)>错误！可能是服务器时间和本地时间不匹配
+BREAK
+
+; 附加清理功能
+#IF
+LARGE <$PARAM(6)> 1
+#ACT
+SETHUMVAR <$STR(A1)> U88 0
+
+
+#IF
+#ACT
+GETHUMVAR <$PARAM(3)> N$U88 <$STR(U88)>
+
+#IF
+LARGE N$U88 0
+#ACT
+SENDMSG 9 此角色已参与过活动：<$STR(N$U88)>
+BREAK
+
+#IF
+#ACT
+MOV N$活动奖励 0
+SETHUMVAR <$STR(A1)> U88 <$PARAM(4)>
+SETHUMVAR <$STR(A1)> S$参数3 <$PARAM(4)>
+
+#IF
+EQUAL S$参数3 10
+NOT SMALL <$UTCNOW8> $劳动开始
+NOT LARGE <$UTCNOW8> $劳动结束
+#ACT
+MOV N$活动奖励 8
+
+#IF
+LARGE S$参数3 10
+NOT SMALL <$UTCNOW8> $劳动开始
+NOT LARGE <$UTCNOW8> $劳动结束
+#ACT
+MOV N$活动奖励 16
+
+
+#IF
+#ACT
+<$STR(A1)>.INC J0 <$STR(S$参数3)>
+<$STR(A1)>.INC J9 <$STR(S$参数3)>
+<$STR(A1)>.INC U30 <$STR(S$参数3)>
+<$STR(A1)>.INC J69 <$STR(S$参数3)>
+<$STR(A1)>.Mul N$充值元宝 <$STR(S$参数3)> 10000
+<$STR(A1)>.Mul N$充值积分 <$STR(S$参数3)> 10
+<$STR(A1)>.MailGive 元宝 <$Str(N$充值元宝)>
+<$STR(A1)>.MailGive 充值 <$STR(S$参数3)>
+<$STR(A1)>.MailGive 积分 <$Str(N$充值积分)>
+<$STR(A1)>.MailGive 荣誉值 <$STR(S$参数3)>
+<$STR(A1)>.MailGive 劳动者勋章 <$STR(N$活动奖励)>
+<$STR(A1)>.SendMail 1 系统奖励 <$USERNAME>，你好！\直播间福利已发放,请点提取! 
+SENDMSG 9 <$PARAM(5)>直播补发成功：<$PARAM(2)>|<$PARAM(3)>|<$PARAM(4)>
+
+
+#IF
+NOT EQUAL <$PARAM(6)> 9
+#ACT
+get_post_data S$上报数据 {"gcode":"直播补发|<$PARAM(2)>|<$PARAM(3)>|<$PARAM(4)>|<$PARAM(5)>","gvalue":"<$PARAM(4)>","desc":"<$PARAM(5)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/gm_log 0 <$STR(S$上报数据)>
+BREAK
+
+; 聊天触发
+[@Triggerchat]
+#OR
+EQUAL <$CHAT> 7
+EQUAL <$CHAT> 2
+#ACT
+STOP
+SENDMSG 9 此频道已关闭
+BREAK
+
+
+#IF
+CHECKCONTAINSTEXT 996m2 <$CHATMSG>
+#ACT
+STOP
+BREAK
+
+#IF
+CheckLevelEx < 500
+#ACT
+STOP
+SENDMSG 9 【提示】:您未达到500级，无法发言!!!!
+BREAK
+
+; 拍卖行上架触发
+[@CanPaimaiItem]
+#IF
+#ACT
+ALLOWPAIMAI 1
+BREAK
+
+#IF
+ISONMAP rxsc807
+#ACT
+ALLOWPAIMAI 1
+SENDMSG 9 当前区域不能使用拍卖行
+BREAK
+
+#IF
+SMALL U3 5
+#ACT
+ALLOWPAIMAI 1
+SENDMSG 9 开通至尊会员激活拍卖行上架资格
+BREAK
+
+#IF
+#ACT
+GETDBITEMFIELDVALUE <$STR(S0)> AUCTIONBY S$拍卖分类
+
+#IF
+EQUAL S$拍卖分类
+#ACT
+ALLOWPAIMAI 1
+SENDMSG 9 限70级以上装备可上架拍卖行。
+SENDMSG 6 限70级以上装备可上架拍卖行。
+BREAK
+
+
+; 商铺购买指定道具触发
+[@CANBUYSHOPITEM4]
+#IF
+CHECKMONEY 充值 < 300
+#ACT
+NOTALLOWBUY 1
+SENDMSG 9 购买失败~需要充值300及以上.
+BREAK
+
+
+
+[@物品相关]
+#CALL [\03自定义按钮\物品触发类.txt] @物品触发类
+#CALL [\03自定义按钮\物品准星类.txt] @物品准星类
+
+; 开启首饰盒
+[@OpenSndaItemBox]
+#IF
+#ACT
+SetSndaItemBox 1
+SENDMSG 6 人物首饰盒开启成功
+
+
+
+; 每日清理触发
+[@ResetDay]
+#IF
+#ACT
+MOV T5 <$YEAR><$MONTH><$DAY>
+MOV T10 <$HOUR>:<$MINUTE>:<$SECOND>
+
+; 沙巴克奖励
+SET [22] 0
+
+; 幸运夺宝变量
+MOV T21 
+MOV T22 
+MOV T23 
+MOV T24 
+MOV T25
+; 每日夺宝充值
+MOV U9 0
+; 每日真实充值（支付多少就是多少）
+MOV U69 0
+; 高级大陆副本进入次数清理
+RESET [45] 4
+; 周返利，每日清理
+SET [5] 0
+; 每日微信礼包
+SET [3] 0
+ADDSTRVALUE T20 44730 0
+;每日进入副本 5个
+RESET [11] 5
+SET [18] 0
+; 每日目标奖励领取标记
+RESET [61] 4
+;每日鉴定次数
+MOV U4 0
+;每日在线奖励计时 7个 U8在线时间
+RESET [21] 7
+; 每日充值福利礼包领取标识 6个
+RESET [51] 6
+; 永恒塔击极品爆率
+SET [15] 0
+; 永恒塔击杀记录
+MOV T7
+; 永恒塔每日首通奖励
+RESET [81] 6
+
+; 国庆66充值奖励限制
+SET [77] 0
+DEPRIVETITLE 花魁榜首,花魁榜二,花魁榜二
+
+; 判断是否连续领取了幸运夺宝
+; 如果登录时间和领取时间相差2天 则清空连续领取天数
+#IF
+#ACT
+DaysBetween <$STR(T6)> <$YEAR>-<$MONTH>-<$DAY>  N11
+DaysBetween <$STR(T77)> <$YEAR>-<$MONTH>-<$DAY> N12
+
+; 连续幸运夺宝
+#IF
+LARGE N11 1
+#ACT
+MOV U22 0
+MOV U23 0
+
+; 连续领取黄金礼包
+#IF
+LARGE N12 1
+#ACT
+MOV U77 0
+
+
+ 
+; =============================充值触发
+[@ReCharge]
+; 劳动节给勋章
+#IF
+LARGE <$UTCNOW8> $劳动开始
+SMALL <$UTCNOW8> $劳动结束
+#ACT
+FORMULATION <$STR(M0)>*10 N$应给数量
+FORMULATION 20000-<$STR(J31)> N$限制数量
+FORMULATION <$STR(N$应给数量)>+<$STR(J31)> N$上限检测
+
+VAR_CHECK <$STR(N$上限检测)> > 20000 <$STR(N$限制数量)> <$STR(N$应给数量)> N$实到数量
+INC J31 <$STR(N$实到数量)>
+MAILGIVE 劳动者勋章 <$STR(N$实到数量)>
+SENDMAIL 203 五一活动奖励 活动期间，每充值1元可获得10个劳动者勋章，\本次获得<劳动者勋章/FCOLOR=250>，请在附件中领取奖励
+
+GET_POST_DATA S$上报数据 {"gevent":"充值送劳动者勋章","gvalue":"<$STR(N$实到数量)>","desc":"累计：<$STR(J31)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+
+
+#IF
+EQUAL U107 <$STR(M0)>
+EQUAL <$GETSTRVALUE(T35,开通高级奖励)> 
+#ACT
+MOV U107 0
+ADDSTRVALUE T35 开通高级奖励 1
+MOV S$拉起支付UI 0
+GOTO @端午战令UI
+GET_POST_DATA S$上报数据 {"gevent":"开通端午战令","gvalue":"<$STR(U107)>","desc":""}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+BREAK
+
+; 联运购买BOSS挑战礼包判定
+#IF
+EQUAL T19 
+EQUAL M0 69
+EQUAL M0 <$STR(U101)>
+#ACT
+MOV T19 1
+MOV S$支付页面
+GOTO @查看BOSS挑战
+GET_POST_DATA S$上报数据 {"gevent":"开通高级BOSS奖励","gvalue":"<$STR(U101)>","desc":"<$STR(T19)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+BREAK
+
+; 高级周奖励开通
+#IF
+EQUAL T26
+EQUAL M0 97
+EQUAL M0 <$STR(U101)>
+#ACT
+CLOSE
+MOV T26 1
+MOV S$拉起支付UI
+SENDMSG 9 已开通高级BOSS通行证，请刷新界面查看
+GET_POST_DATA S$上报数据 {"gevent":"开通高级周奖励","gvalue":"<$STR(U101)>","desc":""}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+; 新服元宝直购检测
+#IF
+LARGE M0 0
+EQUAL M0 <$STR(U104)>
+#ACT
+GOTO @来自支付完成的触发
+BREAK
+
+; 合服超级折扣检测
+#IF
+NOT EQUAL T31
+LARGE M0 0
+EQUAL M0 <$STR(U105)>
+#ACT
+MOV U106 1
+GOTO @超级折扣充值完成发放道具
+BREAK
+
+
+; 正常充值触发流程
+#IF
+LARGE M0 0
+#ACT
+; 清理直购金额标识
+MOV U101 0
+MOV U104 0
+
+MOV N$充值赠送 0
+MOV N$圣诞奖励 0
+; 每日充值
+INC J0 <$STR(M0)>
+; 每日夺宝
+INC J9 <$STR(M0)>
+; 帝王令周期结束还原当前充值
+INC J69 <$STR(M0)>
+; 本周累计充值
+INC U30 <$STR(M0)>
+MONEY 充值 + <$STR(M0)>
+MONEY 充值点 + <$STR(M0)>
+MONEY 荣誉值 + <$STR(M0)>
+FORMULATION <$STR(M0)>*10 N$积分值
+MONEY 积分 + <$STR(N$积分值)>
+
+;记录单最大单笔充值
+VAR_CHECK <$STR(U0)> < <$STR(M0)> <$STR(M0)> <$STR(U0)> U0
+
+; 新春祝福卡HOOK
+#IF
+NOT EQUAL T98
+EQUAL U98 <$STR(M0)>
+CHECKITEM 新春祝福卡 1
+<$STR(T98)>.CHECKONLINE
+NOT SMALL <$UTCNOW8> $春节开始
+NOT LARGE <$UTCNOW8> $春节结束
+#ACT
+TAKE 新春祝福卡 1
+MAILGIVE 福气 <$STR(M0)>
+SENDMAIL 203 新春祝福卡 成功参与新春祝福卡活动\本次获得<福气点<$STR(M0)>/FCOLOR=250>，请在附件中领取奖励
+
+FORMULATION <$STR(M0)>*0.3 N$获得福气
+SETHUMVAR <$STR(T98)> S$福气来源 <$USERNAME>
+SETHUMVAR <$STR(T98)> N$获得福气 <$STR(N$获得福气)>
+<$STR(T98)>.MAILGIVE 福气 <$STR(N$获得福气)>
+<$STR(T98)>.SENDMAIL 203 新春祝福卡 收到祝福\收到来自<玩家【<$STR(S$福气来源)>】赠送/FCOLOR=250>的福气，请在附件中领取奖励
+CLOSE
+; 发送后关闭窗口，由关闭触发清空变量
+get_post_data S$上报数据 {"gevent":"新春祝福卡","gvalue":"<$STR(M0)>","desc":"<$STR(T98)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+
+; 清理祝福卡参数
+#IF
+#ACT
+MOV T98
+MOV U98 0
+
+
+#IF
+LARGE <$UTCNOW8> $春季开始
+SMALL <$UTCNOW8> $春季结束
+#ACT
+FORMULATION <$STR(M0)>/5 N$春季奖励
+FORMULATION <$STR(J31)>+<$STR(N$春季奖励)> N$春季累计奖励
+#IF
+LARGE N$春季累计奖励 200
+#ACT
+FORMULATION 200-<$STR(J31)> N$春季奖励
+#IF
+LARGE N$春季奖励 0
+LARGE <$UTCNOW8> $春季开始
+SMALL <$UTCNOW8> $春季结束
+#ACT
+INC J31 <$STR(N$春季奖励)>
+MAILGIVE 风车 <$STR(N$春季奖励)>
+SENDMAIL 201 春季活动充值奖励 春季活动期间，单次充值金额满5元赠送1个风车，每日上限200个，请在附件中领取奖励
+
+
+#IF
+LARGE <$UTCNOW8> $双蛋开始
+SMALL <$UTCNOW8> $双蛋结束
+#ACT
+FORMULATION <$STR(M0)>/5 N$圣诞奖励
+FORMULATION <$STR(J31)>+<$STR(N$圣诞奖励)> N$圣诞累计奖励
+
+#IF
+LARGE N$圣诞累计奖励 200
+#ACT
+FORMULATION 200-<$STR(J31)> N$圣诞奖励
+#IF
+LARGE N$圣诞奖励 0
+#ACT
+INC J31 <$STR(N$圣诞奖励)>
+MAILGIVE 圣诞礼物 <$STR(N$圣诞奖励)>
+SENDMAIL 201 圣诞充值奖励 双蛋活动期间，单次充值金额满5元赠送1个圣诞礼物，每日上限200个，请在附件中领取奖励
+
+
+; 删档测试 记录充值数据
+#IF
+LARGE G41 0
+#ACT
+GET_POST_DATA S$上报数据 {"type":"setmoney","money":<$Str(M0)>}
+HTTPPOST http://211.149.241.27:4473/api/api996/play_pay 0 <$STR(S$上报数据)>
+
+
+; 单笔赠送计算
+#IF
+LARGE M0 99
+SMALL M0 1000
+#ACT
+MUL N$充值赠送 <$STR(M0)> 10
+DIV N$充值赠送 100
+#IF
+LARGE M0 999
+SMALL M0 5000
+#ACT
+MUL N$充值赠送 <$STR(M0)> 15
+DIV N$充值赠送 100
+#IF
+LARGE M0 4999
+#ACT
+MUL N$充值赠送 <$STR(M0)> 20
+DIV N$充值赠送 100
+
+#IF
+LARGE N$充值赠送 0
+#ACT
+INC J0 <$STR(N$充值赠送)>
+INC J9 <$STR(N$充值赠送)>
+INC J69 <$STR(N$充值赠送)>
+INC U30 <$STR(N$充值赠送)>
+MUL N$积分值赠送 <$STR(N$充值赠送)> 10
+MUL N$赠送元宝 <$STR(N$充值赠送)> 10000
+MONEY 元宝 + <$STR(N$赠送元宝)>
+MONEY 充值 + <$STR(N$充值赠送)>
+MONEY 充值点 + <$STR(N$充值赠送)>
+MONEY 积分 + <$STR(N$积分值赠送)>
+
+
+
+; 充值夺宝统计累积充值金额 累计大于10000投放888奖励
+#IF
+LARGE G0 0
+#ACT
+INC G5 <$STR(M0)>
+
+
+; 充值金额大于10000 投放一次超级奖励G3 （夺宝的888奖励）
+#IF
+LARGE G5 10000
+#ACT
+DEC G5 10000
+INC G3 1
+
+; 联运版本不送黑铁
+#IF
+LARGE <$GAMEID> 3268
+#ACT
+BREAK
+;------------U60记录每次充20元
+#IF
+LARGE <$HFCOUNT> 0
+#ACT
+INC U60 <$STR(M0)>
+
+#IF
+LARGE U60 19
+LARGE <$HFCOUNT> 0
+#ACT
+DIV N$临时 <$STR(U60)> 20
+MAILGIVE 黑铁矿 <$STR(N$临时)>
+SENDMAIL 1 系统奖励 <$USERNAME>，你好！\奖励【黑铁矿×<$STR(N$临时)>】,请点提取！\<*合区后每充值20元赠送1个黑铁矿，请在附件中领取奖励/FCOLOR=250>
+MUL N$临时 20
+DEC U60 <$STR(N$临时)>
+
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓穿戴触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+[@TakeOnEx]
+#CALL [\04人物属性\爆率免伤.txt] @属性刷新EX
+#CALL [\04人物属性\刷新神器等级.txt] @神器等级刷新
+
+
+[@TakeOffEx]
+#CALL [\04人物属性\爆率免伤.txt] @属性刷新EX
+#CALL [\04人物属性\刷新神器等级.txt] @神器等级刷新
+
+; 打开指定窗口 佩戴任何装备都关闭（炼器大师 铁匠功能）
+#IF
+EQUAL N$打开锻造面板 1
+#ACT
+CLOSE
+MOV S$资源POS
+MOV S$选中FMID
+MOV S$选中SID
+MOV S$洗练位置
+BREAK
+
+
+
+[@TAKEON0]
+
+
+[@TAKEON1]
+#IF
+EQUAL N$武器强化 1
+#ACT
+OPENNPCSHOW 378 10
+BREAK
+
+[@TAKEOFF1]
+#IF
+EQUAL N$武器强化 1
+#ACT
+OPENNPCSHOW 378 10
+BREAK
+
+
+[@TakeOff0]
+
+
+[@TakeOn2]
+
+[@TakeOff2]
+;--------------------徽记
+[@TakeOn9]
+
+[@TakeOff9]
+
+;------------------------盾牌
+[@TakeOn16]
+
+[@TakeOff16]
+
+; 刷新玩具外显
+[@TakeOn17]
+#IF
+CheckShowFashion
+NOT EQUAL <$SHORSE>
+#ACT
+GetDBItemFieldValue <$SHORSE> shape N$shape
+ChangeItemShape 17 = <$STR(N$shape)>
+ShowFashion 0
+ShowFashion 1
+
+
+
+[@TakeOn42]
+#IF
+CheckShowFashion
+NOT EQUAL <$SDRESS> 
+#ACT
+GetDBItemFieldValue <$SHORSE> shape N$shape
+ChangeItemShape 17 = <$STR(N$shape)>
+ShowFashion 0
+ShowFashion 1
+
+
+[@TakeOff42]
+#IF
+NOT EQUAL <$SDRESS>
+#ACT
+ChangeItemShape 17 = 0
+#IF
+CheckShowFashion
+#ACT
+ShowFashion 0
+ShowFashion 1
+
+; 玩具限时装备到期触发
+[@ItemExpired]
+#IF
+#ACT
+GetDBItemFieldValue <$ExpiredItemName> StdMode N$StdMode
+#IF
+EQUAL N$StdMode 90
+NOT EQUAL <$SDRESS>
+#ACT
+ChangeItemShape 17 = 0
+
+
+; 刷新显示
+#IF
+CheckShowFashion
+#ACT
+ShowFashion 0
+ShowFashion 1
+
+
+[@自定义排行榜]
+#IF
+CHECKKUAFU
+#ACT
+SENDMSG 9 此区域无法查看排行
+BREAK
+
+#IF
+#ACT
+#Call [\03自定义按钮\排行_战力NPC.txt] @战力排名显示
+
+[@其它排名引用]
+#Call [\03自定义按钮\智能提示.txt] @智能提示
+#Call [\03自定义按钮\排行_爆率NPC.txt] @爆率排名显示
+#Call [\03自定义按钮\排行_等级NPC.txt] @等级排名显示
+#Call [\03自定义按钮\排行_刀魂NPC.txt] @刀魂排名显示
+
+
+; 2022年8月10日
+; 替身稻草无效  这两个触发无论死亡是否掉落都会触发
+[@DropUseItemsBefore]
+; 跨服乱斗 掉落身上装备概率减少80%
+#IF
+CHECKKUAFU
+ISONMAP KUAFU03
+RANDOMEX 50 100
+#ACT
+STOP
+BREAK
+
+[@DropBagItemsBefore]
+#IF
+CHECKPKPOINTEX ? 300
+#ACT
+BREAK
+
+#IF
+NOT CHECKITEM 替身稻草人 1
+#ACT
+BREAK
+
+#IF
+#ACT
+TAKE 替身稻草人 1
+STOP
+SENDMSG 9 替身稻草保护背包道具掉落成功
+BREAK
+
+; 扔掉道具触发
+[@DropItemfrontEX]
+
+
+; 怪物掉落装备记录
+[@MonDropItemEX]
+#IF
+#ACT
+LINKPICKUPITEM
+GetDBItemFieldValue <$CURRTEMNAME> NeedLevel N$NeedLevel
+
+
+#IF
+NOT CHECKITEMFLAG -1 1
+LARGE <$GetTypeBRow(cfg_piaozi_drop,0,<$CURRTEMNAME>)> 0
+#ACT
+SENDMOVEMSG 0 254 0 410 1 <[系统]：/FCOLOR=254>物品<[<$CURRTEMNAME>]/FCOLOR=253>掉落在地图<<$MAPTITLE>/FCOLOR=251>（<$X>,<$Y>）处！
+
+
+#IF
+LARGE N$NEEDLEVEL 104
+NOT CHECKITEMFLAG -1 1
+#ACT
+get_post_data S$上报掉落 {"gitem":"<$CURRTEMNAME>","itemlevel":"<$STR(N$NeedLevel)>","itemid":"<$CURRTEMMAKEINDEX>","mapname":"<$maptitle>[<$x>.<$y>]","monster":"<$CURRRTARGETNAME>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/drop_up 0 <$STR(S$上报掉落)>
+BREAK
+
+
+;拾取触发
+[@PickUpItemEx]
+#IF
+#ACT
+LINKPICKUPITEM
+; 攻沙期间在皇宫拾取装备不掉属性
+#IF
+ISONMAP rxsc807
+CHECKUNDERWAR 沙巴克
+#ACT
+BREAK
+; 攻沙期间在沙巴克范围拾取装备不掉属性
+#IF
+CHECKUNDERWAR 沙巴克
+CHECKCASTLEWARAREA 沙巴克
+#ACT
+BREAK
+
+
+#IF
+NOT CHECKITEMFLAG -1 1
+EQUAL <$NEWBAGITEMNAME> 藏宝图
+#ACT
+#CALL [\悬浮按钮\藏宝图鉴定.txt] @鉴定藏宝图
+
+
+
+; 清理鉴定属性
+#IF
+CHECKITEMFLAG -1 2
+#ACT
+SETITEMFLAG -1 2 0
+SetNewItemValue -1 0 = 0
+SetNewItemValue -1 1 = 0
+SetNewItemValue -1 2 = 0
+SetNewItemValue -1 3 = 0
+SetNewItemValue -1 4 = 0
+SetNewItemValue -1 5 = 0
+SetNewItemValue -1 6 = 0
+SetNewItemValue -1 7 = 0
+SetNewItemValue -1 8 = 0
+SetNewItemValue -1 11 = 0
+CHANGEITEMADDVALUE -1 0 = 0
+CHANGEITEMADDVALUE -1 1 = 0
+CHANGEITEMADDVALUE -1 2 = 0
+CHANGEITEMADDVALUE -1 3 = 0
+CHANGEITEMADDVALUE -1 4 = 0
+CHANGEITEMADDVALUE -1 5 = 0
+CHANGECUSTOMITEMTEXT -1 -1 0
+CHANGECUSTOMITEMVALUE -1 9 = 0 0
+UpDateBoxItem -1
+SENDUPGRADEITEM
+BREAK
+
+#IF
+NOT CHECKITEMFLAG -1 2
+#ACT
+#CALL [\悬浮按钮\铁匠功能2.TXT] @拾取鉴定EX
+
+#IF
+LARGE <$HFCOUNT> 0
+#ACT
+SETITEMFLAG -1 1 1
+BREAK
+
+#IF
+NOT CHECKITEMFLAG -1 1
+#ACT
+SETITEMFLAG -1 1 1
+
+
+; 新手地图不给首爆
+#IF
+ISONMAP EM000
+#ACT
+BREAK
+
+; 跨服地图不给首爆
+#IF
+CHECKKUAFU
+#ACT
+BREAK
+
+; 合区后不给首爆
+#IF
+LARGE <$HFCOUNT> 0
+#ACT
+BREAK
+
+; 检测首曝
+#IF
+#ACT
+GETSTRVALUE A16 <$CURRTEMNAME> N$首爆名额
+GETSTRVALUE T12 <$CURRTEMNAME> N$是否领取
+
+#OR
+EQUAL N$首爆名额 0
+LARGE N$是否领取 0
+#ACT
+BREAK
+
+#IF
+#ACT
+DEC N$首爆名额 1
+ADDSTRVALUE T12 <$CURRTEMNAME> 1
+ADDSTRVALUE A16 <$CURRTEMNAME> <$STR(N$首爆名额)>
+ADDSTRVALUE A15 <$CURRTEMNAME> <$USERNAME>
+GETSTRVALUE A13 <$CURRTEMNAME> N$首爆金额
+GETSTRVALUE A14 <$CURRTEMNAME> S$首爆货币
+SENDMOVEMSG 0 254 0 40 1 恭喜玩家【{<$UserName>/FCOLOR=250}】成功领取{<$CURRTEMNAME>/FCOLOR=70}的首爆奖励{<$STR(S$首爆货币)>*<$STR(N$首爆金额)>/FCOLOR=250}！
+; GuildNoticeMsg 151 13 恭喜玩家【{<$UserName>|250:0:1}】成功领取{<$CURRTEMNAME>|70:0:1}的首爆奖励{<$STR(S$首爆货币)>*<$STR(N$首爆金额)>|250:0:1}
+
+#IF
+EQUAL S$首爆货币 充值
+#ACT
+FORMULATION <$STR(N$首爆金额)>*10000 N$计算元宝
+MONEY 充值 + <$STR(N$首爆金额)>
+MONEY 元宝 + <$STR(N$计算元宝)>
+SENDMSG 9 恭喜获得首爆奖励<font color='#FF00FF'><$STR(S$首爆货币)>*<$STR(N$首爆金额)>元</font>
+; GuildNoticeMsg 250 13 恭喜获得首爆奖励{<$STR(S$首爆货币)>*<$STR(N$首爆金额)>元|253:0:1} self
+BREAK
+
+#IF
+EQUAL S$首爆货币 金刚石
+#ACT
+MONEY 金刚石 + <$STR(N$首爆金额)>
+SENDMSG 9 恭喜获得首爆奖励<font color='#7FFF00'><$STR(S$首爆货币)>*<$STR(N$首爆金额)>个</font>
+; GuildNoticeMsg 250 13 恭喜获得首爆奖励{<$STR(S$首爆货币)>*<$STR(N$首爆金额)>个|253:0:1} self
+BREAK
+
+
+[@卧龙遗迹传送]
+#IF
+NOT CHECKMONMAP wlsz 1
+#ACT
+MAP wlyj
+GuildNoticeMsg 151 11 玩家{【<$USERNAME>】|70:0:1}进入了{[卧龙遗迹]|250:0:1}
+#ELSEACT
+GMEXECUTE Backstep self
+SENDMSG 9 需要击杀卧龙山庄所有人形BOSS才可进入
+
+
+[@挖矿活动触发]
+#IF
+NOT EQUAL A12 已开启
+#ACT
+TAKEW <$WEAPON>
+SENDMSG 9 黄金矿工活动已结束
+BREAK
+
+#IF
+RANDOMEX 50 1000
+NOT SMALL <$UTCNOW8> $春季开始
+NOT LARGE <$UTCNOW8> $春季结束
+#ACT
+MOV S$权重奖池 春#50|暖#20|花#10|开#5
+RANSJSTR <$STR(S$权重奖池)> 1 3 S$权重结果 S$奖池剩余
+GIVE <$STR(S$权重结果)> 1
+
+#IF
+RANDOMEX 50 1000
+NOT SMALL <$UTCNOW8> $劳动开始
+NOT LARGE <$UTCNOW8> $劳动结束
+#ACT
+GIVE 劳动者勋章 1
+
+#IF
+RANDOMEX 800 1000
+#ACT
+MOV S$权重奖池 橡树果#2000|修炼石#2000|觉醒石#2000|40元宝#100|50元宝#100|100元宝#100|200元宝#100|30金刚石#100|40金刚石#100|50金刚石#100|100金刚石#100
+RANSJSTR <$STR(S$权重奖池)> 1 3 S$权重结果 S$奖池剩余
+GIVE <$STR(S$权重结果)> 1
+BREAK
+
+#IF
+RANDOMEX 200 1000
+#ACT
+MOV S$权重奖池 红包(小)#50|红包(中)#20|红包(大)#10|黑铁矿#5
+RANSJSTR <$STR(S$权重奖池)> 1 3 S$权重结果 S$奖池剩余
+GIVE <$STR(S$权重结果)> 1
+GUILDNOTICEMSG 249 11 恭喜玩家{[<$USERNAME>]|70:0:1}通过挖矿获得{<$STR(S$权重结果)>|253:0:1}
+BREAK
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓跑步触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+
+[@足迹显示]
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+MAPEFFECT 8 <$MAP> <$X> <$Y> 55062 1 0
+
+[@Run]
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+DELAYGOTO 120 @足迹显示
+
+
+#IF
+LARGE g387 120
+#ACT
+BREAK
+
+#IF
+CheckMapName rxsc051
+#ACT
+MapMove rxsc042 333 333 5
+BREAK
+
+#IF
+NOT Equal A10 已开启
+#ACT
+BREAK
+
+#IF
+RANDOMEX 20 100
+Equal A10 已开启
+checklevelex < 400
+CheckHumInRange Rxsc042 331 331 10
+#ACT
+MOV N$经验增加 1 11
+MUL N$经验增加 100000
+CHANGEEXP + <$STR(N$经验增加)>
+
+
+#IF
+RANDOMEX 1 100
+Equal A10 已开启
+CheckHumInRange Rxsc042 331 331 10
+#ACT
+GetRandomText ..\QuestDiary\01配置项\03高级跑酷抽取.txt S$高级物品
+GIVE <$Str(S$高级物品)> 1
+SENDMSG 1 恭喜玩家：【<$UserName>】参与跑酷活动，成功获得物品：<$Str(S$高级物品)>！！
+BREAK
+
+#IF
+RANDOMEX 2 100
+Equal A10 已开启
+CheckHumInRange Rxsc042 331 331 10
+#ACT
+GetRandomText ..\QuestDiary\01配置项\02中级跑酷抽取.txt S$中级物品
+GIVE <$Str(S$中级物品)> 1
+SENDMSG 1 恭喜玩家：【<$UserName>】参与跑酷活动，成功获得物品：<$Str(S$中级物品)>！！
+BREAK
+
+#IF
+RANDOMEX 30 100
+Equal A10 已开启
+CheckHumInRange Rxsc042 331 331 10
+#ACT
+GetRandomText ..\QuestDiary\01配置项\01低级跑酷抽取.txt S$低级物品
+GIVE <$Str(S$低级物品)> 1
+SENDMSG 1 恭喜玩家：【<$UserName>】参与跑酷活动，成功获得物品：<$Str(S$低级物品)>！！
+BREAK
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓走路触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+[@Walk]
+#IF
+LARGE g387 120
+#ACT
+BREAK
+
+#IF
+CheckMapName rxsc051
+#ACT
+MapMove rxsc042 331 331 5
+BREAK
+
+; 地图事件触发
+[@MapEventRun]
+
+
+
+;地图切换触发
+[@EnterMap]
+#IF
+EQUAL <$GetTypeBRow(cfg_禁止自动拾取地图,1,<$MAP>)> -1
+#ACT
+PICKUPITEMS 0 8 500
+#ELSEACT
+PICKUPITEMS 0 0 10000
+
+; PC和移动端ICON坐标不同
+#IF
+#ACT
+VAR_CHECK <$CLIENTFLAG> = 1 0 42 N$OX
+VAR_CHECK <$CLIENTFLAG> = 1 190 222 N$OY
+; SENDMSG 9 <$STR(N$OX)>|<$STR(N$OY)>
+
+; 苍月地图计时清理
+#IF
+LARGE <$GETTYPEBROW(CFG_苍月地图免伤,1,<$MAP>)> 0
+#ACT
+MOV N$已过时间 <$UTCNOW8>
+DEC N$已过时间 <$STR(U56)>
+MOV N$冷却时间 7200
+DEC N$冷却时间 <$STR(N$已过时间)>
+MOV S$地图倒计时 <Img|children={4440,4441}|x=<$STR(N$OX)>|y=<$STR(N$OY)>|img=public/icon_paihangbang_05.png|height=30|width=200>
+INC S$地图倒计时 <Text|id=4440|x=10|y=3|outline=1|color=250|size=18|text=剩余时间:>
+INC S$地图倒计时 <TIMETIPS|id=4441|x=90|y=3|time=<$STR(N$冷却时间)>|outline=1|count=1|size=18|color=250|link=@地图时间截止回城>
+ADDBUTTON 101 445 <$STR(S$地图倒计时)>
+#ELSEACT
+DELBUTTON 101 445
+
+; 永恒塔副本计时
+#IF
+CHECKCONTAINSTEXT <$MAPTITLE> 永恒塔
+#ACT
+MirrorMapTime <$STR(S$副本地图ID)>
+MOV S$副本倒计时 <Img|children={4440,4441}|x=<$STR(N$OX)>|y=<$STR(N$OY)>|img=public/icon_paihangbang_05.png|height=30|width=200>
+INC S$副本倒计时 <Text|id=4440|x=10|y=3|outline=1|color=250|size=18|text=挑战剩余:>
+INC S$副本倒计时 <TIMETIPS|id=4441|x=90|y=3|time=<$STR(D99)>|outline=1|count=1|size=18|color=250>
+ADDBUTTON 101 446 <$STR(S$副本倒计时)>
+#ELSEACT
+DELBUTTON 101 446
+
+; 爆率地图计时清理
+#IF
+NOT ISONMAP fmmj 
+NOT ISONMAP brmmj
+NOT ISONMAP brmmj2
+#ACT
+DELBUTTON 101 444
+DELBUTTON 105 444
+
+; 一夜暴富地图添加查看排行按钮
+#IF
+ISONMAP yybf
+#ACT
+MOV S$暴富排名 <Button|x=<$STR(N$OX)>|y=<$STR(N$OY)>|tips=点击查看排行榜|nimg=custom/000181.png|link=@查看暴富排名>
+ADDBUTTON 101 1051 <$STR(S$暴富排名)>
+#ELSEACT
+DELBUTTON 101 1051
+
+; 退出副本回收地图 副本ID包含了角色名字就是副本地图
+#IF
+NOT EQUAL <$MAP> <$OLDMAP>
+CHECKCONTAINSTEXT <$OLDMAP> <$USERNAME>
+#ACT
+DELMIRRORMAP <$OLDMAP>
+
+
+#IF
+LARGE U50 14
+SMALL U50 21
+#ACT
+DELAYGOTO 500 @新手传送任务检测
+
+; 充值地图显示地图爆率
+#IF
+#ACT
+MOV N$显示爆率 <$cfg_地图单独爆率配置(<$GetTypeBRow(cfg_地图单独爆率配置,0,<$map>)>_1)>
+
+#IF
+EQUAL N$显示爆率 0
+#ACT
+DELBUTTON 103 89
+BREAK
+
+#IF
+Equal <$CLIENTFLAG> 2
+#ACT
+MOV S$爆率显示 <Text|x=10|y=-50|color=249|outline=1|outlinecolor=0|text=地图爆率:<$STR(N$显示爆率)>%>
+ADDBUTTON 103 89 <$STR(S$爆率显示)>
+BREAK
+
+#IF
+Equal <$CLIENTFLAG> 1
+#ACT
+MOV S$爆率显示 <Text|x=250|y=-170|color=249|outline=1|outlinecolor=0|text=地图爆率:<$STR(N$显示爆率)>%>
+ADDBUTTON 103 89 <$STR(S$爆率显示)>
+BREAK
+
+
+[@新手传送任务检测]
+#IF
+ISONMAP <$cfg_新手任务配置(<$GetTypeBRow(cfg_新手任务配置,0,<$STR(U50)>)>_2)>
+#ACT
+MAILGIVE 元宝 <$cfg_新手任务配置(<$GetTypeBRow(cfg_新手任务配置,0,<$STR(U50)>)>_3)>
+SENDMAIL 230 任务奖励 <$cfg_新手任务配置(<$GetTypeBRow(cfg_新手任务配置,0,<$STR(U50)>)>_4)>
+
+NEWDELETETASK <$STR(U50)>
+MOV U50 <$cfg_新手任务配置(<$GetTypeBRow(cfg_新手任务配置,0,<$STR(U50)>)>_1)>
+NEWPICKTASK <$STR(U50)>
+BREAK
+
+
+
+
+
+
+
+; 一夜暴富地图杀怪检测怪物数量，不足1000则刷新
+[@检测怪物数量]
+#IF
+EQUAL <$HOUR> 18
+NOT CHECKMONMAP YYBF 1000
+#ACT
+MONGENEX  YYBF 165 238  暴富·钉耙猫  250 800 0 251 
+MONGENEX  YYBF 237 219  暴富·钉耙猫  250 800 0 251 
+BREAK
+
+[@小组进入帝国边境判断]
+#IF
+EQUAL <$GETSTRVALUE(Z6,帝国边境)> 1
+#ACT
+SETHUMVAR <$TEAM0> S$提示队员 <$USERNAME>
+<$TEAM0>.MESSAGEBOX 队员[<$STR(S$提示队员)>]已进入过1次副本。
+BREAK
+
+#IF
+#ACT
+GETHUMVAR <$TEAM0> S$队长M <$MAP>
+GETHUMVAR <$TEAM0> N$队长X <$X>
+GETHUMVAR <$TEAM0> N$队长Y <$Y>
+
+#IF
+NOT CheckHumInRange <$STR(S$队长M)> <$STR(N$队长X)> <$STR(N$队长Y)> 10
+#ACT
+SETHUMVAR <$TEAM0> S$提示队员 <$USERNAME>
+<$TEAM0>.MESSAGEBOX 队员[<$STR(S$提示队员)>]未在你的附近。
+BREAK
+
+#IF
+#ACT
+<$TEAM0>.INC N$是否可以进入 1
+BREAK
+
+[@小组进入未知暗殿判断]
+#IF
+EQUAL <$GETSTRVALUE(Z6,未知暗殿1)> 1
+#ACT
+SETHUMVAR <$TEAM0> S$提示队员 <$USERNAME>
+<$TEAM0>.MESSAGEBOX 队员[<$STR(S$提示队员)>]已进入过1次副本。
+BREAK
+
+#IF
+#ACT
+GETHUMVAR <$TEAM0> S$队长M <$MAP>
+GETHUMVAR <$TEAM0> N$队长X <$X>
+GETHUMVAR <$TEAM0> N$队长Y <$Y>
+
+#IF
+NOT CheckHumInRange <$STR(S$队长M)> <$STR(N$队长X)> <$STR(N$队长Y)> 10
+#ACT
+SETHUMVAR <$TEAM0> S$提示队员 <$USERNAME>
+<$TEAM0>.MESSAGEBOX 队员[<$STR(S$提示队员)>]未在你的附近。
+BREAK
+
+#IF
+#ACT
+<$TEAM0>.INC N$是否可以进入 1
+BREAK
+
+
+[@多人副本进入检测]
+#IF
+NOT EQUAL <$GETSTRVALUE(Z6,<$MAPTITLE>)> 1
+#ACT
+ADDSTRVALUE Z6 <$MAPTITLE> 1
+#ELSEACT
+GOTO @读秒回城
+
+
+[@击杀隐藏BOSS队伍触发]
+#IF
+#ACT
+GETHUMVAR <$TEAM0> S$每周BOSS地图 <$STR(S$每周BOSS地图)>
+GETHUMVAR <$TEAM0> S$每周BOSS击杀 <$STR(S$每周BOSS击杀)>
+
+#IF
+ISONMAP <$STR(S$每周BOSS地图)>
+#ACT
+ADDSTRVALUE T13 <$STR(S$每周BOSS击杀)> 1
+BREAK
+
+
+[@帝国副本击杀触发]
+#IF
+#ACT
+MOV N$奖励倍数 1
+MOV S$双倍提示 
+GETHUMVAR <$TEAM0> S$帝国副本击杀 <$STR(S$帝国副本击杀)>
+MOV N$MOB_ROW <$GetTypeBRow(cfg_怪物功勋配置,1,<$STR(S$帝国副本击杀)>)>
+
+#IF
+CHECK [54] 1
+#ACT
+MOV N$奖励倍数 2
+MOV S$双倍提示 （双倍功勋）
+
+
+#IF
+LARGE N$MOB_ROW -1
+#ACT
+MOVR N$奖励功勋 <$cfg_怪物功勋配置(<$STR(N$MOB_ROW)>_2)> <$cfg_怪物功勋配置(<$STR(N$MOB_ROW)>_3)>
+MUL N$奖励功勋 <$STR(N$奖励倍数)>
+MONEY 功勋 + <$STR(N$奖励功勋)>
+SENDMSG 9 击杀边境BOSS，奖励功勋<$STR(N$奖励功勋)>点<$STR(S$双倍提示)>
+BREAK
+
+
+; 击杀年兽全局提问，只要攻击过年兽的玩家都可以获得BUFF
+[@驱赶年兽判断BUFF]
+#IF
+EQUAL J29 1
+#ACT
+ADDBUFF 61000
+SENDMSG 9 获得勇者之息BUFF
+BREAK
+
+[@检测怪物沙漠废墟]
+; 沙漠废墟 检测刷怪
+#IF
+ISONMAP dgfx
+NOT CHECKMONMAP dgfx 50
+#ACT
+MonGenEx dgfx 200 190 沙虫 			500 100 0 255
+MonGenEx dgfx 200 190 威思儿小虫 	500 100 0 255
+MonGenEx dgfx 200 190 鹰 			500 100 0 255
+BREAK
+
+
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓杀怪触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+[@KillMon]
+#IF
+ISONMAP YYBF
+EQUAL <$HOUR> 18
+#ACT
+CALCVAR HUMAN 杀怪数 + 10
+SAVEVAR HUMAN 杀怪数
+DELAYGOTO 10 @检测怪物数量
+BREAK
+
+#IF
+RANDOM 10
+ISONMAP dgfx
+EQUAL <$HOUR> 12
+#ACT
+DELAYGOTO 10 @检测怪物沙漠废墟
+BREAK
+
+; 击杀塔主记录
+#IF
+CHECKCONTAINSTEXT <$KILLMONNAME> 塔主
+CHECKCONTAINSTEXT <$KILLMONNAME> 永恒塔
+#ACT
+INC T7 <$KILLMONNAME>|
+
+; 击杀隐藏BOSS
+#IF
+CHECKCONTAINSTEXT [幽灵船长][真·暗之牛魔王][真·暗之虹魔教主][卧龙之魂·镇天神龙][◇◇◇远古赤月·山海恶魔◇◇◇] [<$KILLMONNAME>]
+#ACT
+ADDSTRVALUE T13 <$KILLMONNAME> 1
+SETHUMVAR <$TEAM0> S$每周BOSS地图 <$MAP>
+SETHUMVAR <$TEAM0> S$每周BOSS击杀 <$KILLMONNAME>
+
+MOV S$组队成员 <$TEAM0>|<$TEAM1>|<$TEAM2>|<$TEAM3>|<$TEAM4>|<$TEAM5>|<$TEAM6>|<$TEAM7>|<$TEAM8>|<$TEAM9>
+get_post_data S$上报数据 {"gevent":"隐藏BOSS[<$KILLMONNAME>]","gvalue":"1","desc":"<$STR(S$组队成员)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+GOTOLABELEX 0 @击杀隐藏BOSS队伍触发
+
+
+#IF
+CheckMirrorMap <$MAP>
+LARGE <$GetTypeBRow(cfg_怪物功勋配置,1,<$KILLMONNAMEEX>)> -1
+#ACT
+SETHUMVAR <$TEAM0> S$帝国副本击杀 <$KILLMONNAMEEX>
+GOTOLABELEX 2 @帝国副本击杀触发
+
+
+#IF
+LARGE <$UTCNOW8> $双蛋开始
+SMALL <$UTCNOW8> $双蛋结束
+LARGE <$GetTypeBRow(cfg_掉落圣诞节,0,<$KILLMONNAME>)> -1
+RANDOMEX <$cfg_掉落圣诞节(<$GetTypeBRow(cfg_掉落圣诞节,0,<$KILLMONNAME>)>_1)> 10000
+#ACT
+AddMonDrop 雪花
+
+
+; 春节掉落概率偏低
+#IF
+NOT SMALL <$UTCNOW8> $春节开始
+NOT LARGE <$UTCNOW8> $春节结束
+LARGE <$GetTypeBRow(cfg_掉落春节,0,<$KILLMONNAME>)> -1
+RANDOMEX <$cfg_掉落春节(<$GetTypeBRow(cfg_掉落春节,0,<$KILLMONNAME>)>_1)> 15000
+#ACT
+AddMonDrop 新年烟花
+
+
+
+; 春季 集字道具掉落 3 - 4 月
+#IF
+NOT SMALL <$UTCNOW8> $春季开始
+NOT LARGE <$UTCNOW8> $春季结束
+LARGE <$GetTypeBRow(cfg_掉落春季,0,<$KILLMONNAME>)> -1
+#ACT
+MOV S$集字掉落 
+MOV S$集字奖池 <$cfg_掉落春季(<$GetTypeBRow(cfg_掉落春季,0,<$KILLMONNAME>)>_1)>
+RANSJSTR <$STR(S$集字奖池)> 1 3 S$集字掉落 S$奖池剩余
+AddMonDrop <$STR(S$集字掉落)>
+
+
+; 劳动节掉落概率偏低 5月-6月
+#IF
+NOT SMALL <$UTCNOW8> $劳动开始
+NOT LARGE <$UTCNOW8> $劳动结束
+LARGE <$GetTypeBRow(cfg_掉落春节,0,<$KILLMONNAME>)> -1
+RANDOMEX <$cfg_掉落春节(<$GetTypeBRow(cfg_掉落春节,0,<$KILLMONNAME>)>_1)> 10000
+#ACT
+AddMonDrop 劳动者勋章
+
+; 劳动节掉落概率偏低 6月-7月
+#IF
+NOT SMALL <$UTCNOW8> $端午开始
+NOT LARGE <$UTCNOW8> $端午结束
+LARGE <$GetTypeBRow(cfg_掉落春节,0,<$KILLMONNAME>)> -1
+RANDOMEX <$cfg_掉落春节(<$GetTypeBRow(cfg_掉落春节,0,<$KILLMONNAME>)>_1)> 15000
+#ACT
+AddMonDrop 糯米粽子
+
+
+; BOSS挑战计数 69块那个
+#IF
+LARGE <$GetTypeBRow(cfg_BOSS挑战配置,1,<$KILLMONNAME>)> -1
+#ACT
+GETSTRVALUE T17 <$cfg_BOSS挑战配置(<$GetTypeBRow(cfg_BOSS挑战配置,1,<$KILLMONNAME>)>_0)>_击杀 N$击杀数量
+FORMULATION <$STR(N$击杀数量)>+1 N$击杀数量
+VAR_CHECK <$STR(N$击杀数量)> > 5 5 <$STR(N$击杀数量)> N$击杀数量
+ADDSTRVALUE T17 <$cfg_BOSS挑战配置(<$GetTypeBRow(cfg_BOSS挑战配置,1,<$KILLMONNAME>)>_0)>_击杀 <$STR(N$击杀数量)>
+
+
+
+#IF
+CHECKITEMW 绝版山海夔牛 1
+EQUAL <$KILLMONNAME> ◇◇◇上古异兽·山海奎牛◇◇◇
+#ACT
+MOV N15 1
+DELAYGOTO 100 @山海奎牛击杀专属奖励
+
+
+#IF
+ISONMAP dgfx
+RANDOMEX 500 10000
+#ACT
+MOV N$CHECK 1
+MESSAGEBOX 废墟遗迹开启，是否立即进入？\*废墟遗迹随机召唤BOSS @进入废墟遗迹 @不进去
+BREAK
+
+#IF
+ISONMAP dgfx
+RANDOMEX 200 10000
+#ACT
+MOV S$BOSS奖池 废墟魔王·[福利]#25|山海圣兽※白虎#6|山海圣兽※朱雀#6|
+INC S$BOSS奖池 山海圣兽※玄武#6|山海圣兽※青龙#7|◇◇◇上古异兽·山海奎牛◇◇◇#15|
+INC S$BOSS奖池 ◇◇◇上古异兽·山海朱厌◇◇◇#15|◇◇◇蛮荒兽界·狂暴巨魔◇◇◇#10|◇◇◇蛮荒兽界·邪恶怨灵◇◇◇#10
+RANSJSTR <$STR(S$BOSS奖池)> 1 3 S$刷新BOSS S$NULL
+MonGenEx <$MAP> <$X> <$Y> <$STR(S$刷新BOSS)> 3 1 0 250
+GuildNoticeMsg 250 11 玩家{<$USERNAME>在<$MAPTITLE>[<$X>.<$Y>]|70:0:1}召唤出BOSS{[<$STR(S$刷新BOSS)>]|253:0:1}
+BREAK
+
+
+#IF
+EQUAL <$KILLMONNAME> 真·暗之虹魔教主
+#ACT
+MOV G40 0
+GUILDNOTICEMSG 250 11 {真·暗之虹魔教主|151:1:0}已被击败，8小时候将再次刷新……
+
+#IF
+RANDOMEX 1 50
+SMALL J13 <$STR(N$奇遇次数)>
+LARGE <$GetTypeBRow(cfg_禁止切割怪,1,<$KILLMONNAME>)> -1
+#ACT
+MOV N$CHECK 1
+MESSAGEBOX 触发奇遇场景，是否现在进入？\　\*进入奇遇场景使用回城石将回到原来的地图。 @确定进入奇遇 @不进奇遇
+BREAK
+
+; 跨服怪物死亡掉落
+#IF
+EQUAL <$KILLMONNAME> 发财树
+#ACT
+THROWITEM <$MAP> <$X> <$Y> 15 100000元宝   10|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 15 100万元宝    2|60  1 0 0
+THROWITEM <$MAP> <$X> <$Y> 15 100000金刚石 5|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 15 200000金刚石 2|60  1 0 0
+THROWITEM <$MAP> <$X> <$Y> 15 魔法娃娃     10|60 1 0 0
+BREAK
+
+; 活动怪物掉落
+#IF
+Equal <$KILLMONNAME> 圣诞雪人
+#ACT
+MOVR N$掉落道具1 5 21
+MOVR N$掉落道具2 10 31
+MOVR N$掉落道具3 5 10
+MOVR N$掉落道具4 1 5
+THROWITEM <$MAP> <$X> <$Y> 8 圣诞礼物 <$STR(N$掉落道具1)>|1 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 8 雪花     <$STR(N$掉落道具2)>|1 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 8 魔法娃娃  <$STR(N$掉落道具3)>|1 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 8 平安铃铛  <$STR(N$掉落道具4)>|1 1 0 0
+BREAK
+
+; 大于100级，还在新手地图
+#IF
+ISONMAP em000
+CHECKLEVELEX ? 100
+#ACT
+NEWDELETETASK 2
+MOV U50 3
+NEWPICKTASK 3
+OPENNPCSHOWEX 15 5 5
+SETNPCEFFECT 15 5056 1 100
+BREAK
+
+;--------每日杀怪
+#IF
+#ACT
+INC J5 1
+
+;--------------------年兽
+#IF
+EQUAL <$KILLMONNAME> 恭喜发财·年兽
+#ACT
+ADDBUFF 61000
+THROWITEM <$MAP> <$X> <$Y> 10 红包(小) 		20|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 红包(中) 		10|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 红包(大) 		5|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 新年烟花	  	30|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 庆典蛋糕   	10|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 100000元宝  	30|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 10000金刚石 	10|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 1元充值  		20|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 2元充值  		10|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 5元充值  		3|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 10元充值  	2|0 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 20元充值  	1|0 1 0 0
+GOTOLABELEX 3 @驱赶年兽判断BUFF 10
+
+
+#IF
+EQUAL <$KILLMONNAME> 百倍爆率·【BOSS】
+#ACT
+ADDBUFF 61000
+THROWITEM <$MAP> <$X> <$Y> 7 10000元宝     10|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 50000元宝     5|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 100000元宝    1|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 10000金刚石   10|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 50000金刚石   5|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 100000金刚石  1|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 仙灵珠        5|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 沉默水晶      10|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 项链保护卷    3|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 黑铁矿        5|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 青铜挑战者勋章  3|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 白银挑战者勋章  2|30 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 7 黄金挑战者勋章  1|30 1 0 0
+GOTOLABELEX 3 @驱赶年兽判断BUFF 10
+
+;--------------------世界BOSS
+#IF
+EQUAL <$KILLMONNAME> ●●●●蚀九阴●●●●
+#ACT
+MOVR N$碎片数 5 21
+MOVR N$水晶数 1 3
+MOVR N$石头数 10 21
+THROWITEM <$MAP> <$X> <$Y> 10 书页 <$STR(N$碎片数)>|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 沉默水晶 <$STR(N$水晶数)>|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 修炼石 <$STR(N$石头数)>|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 觉醒石 <$STR(N$石头数)>|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 橡树果 <$STR(N$石头数)>|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 1000金刚石 20|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 5000金刚石 10|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 10000金刚石 5|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 仙灵珠  1|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 天宫之锤  50|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 命运水晶  20|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 项链保护卷  2|60 1 0 0
+THROWITEM <$MAP> <$X> <$Y> 10 龙珠 10|60 1 0 0
+
+#IF
+EQUAL <$KILLMONNAME> ●●●●蚀九阴●●●●
+NOT SMALL <$UTCNOW8> $劳动开始
+NOT LARGE <$UTCNOW8> $劳动结束
+#ACT
+THROWITEM <$MAP> <$X> <$Y> 10 劳动者勋章 10|60 1 0 0
+
+#IF
+RANDOMEX 500 1000
+EQUAL <$KILLMONNAME> ●●●●蚀九阴●●●●
+#ACT
+THROWITEM <$MAP> <$X> <$Y> 10 黑铁矿 2|60 1 0 0
+
+
+#IF
+RANDOMEX 50 1000
+EQUAL <$KILLMONNAME> ●●●●蚀九阴●●●●
+#ACT
+THROWITEM <$MAP> <$X> <$Y> 10 白银矿 1|60 1 0 0
+
+; 暗降鞭尸概率
+#IF
+LARGE N$鞭尸概率 1
+#ACT
+DIV N$鞭尸概率1 <$STR(N$鞭尸概率)> 2
+
+;---------------------鞭尸几率
+#IF
+LARGE N$鞭尸概率 0
+RANDOMEX <$STR(N$鞭尸概率1)> 120
+EQUAL <$GetTypeBRow(cfg_禁止鞭尸怪物,1,<$MAP>)> -1
+EQUAL <$GetTypeBRow(cfg_禁止鞭尸怪物,0,<$KILLMONNAME>)> -1
+#ACT
+MONITEMSEX <$KILLMONNAME> 1 1000
+SENDMSG 9 成功触发鞭尸！[<$KILLMONNAME>]再爆一次。
+
+
+; 新手地图不给神力
+#IF
+ISONMAP EM000
+#ACT
+BREAK
+
+
+#IF
+#ACT
+MOV N$神力值数 1
+
+#IF
+CheckContainsText <$KILLMONNAME> 变异
+#ACT
+MOV N$神力值数 2
+#IF
+CheckContainsText <$KILLMONNAME> 魔化
+#ACT
+MOV N$神力值数 3
+#IF
+CheckContainsText <$KILLMONNAME> 潘夜
+#ACT
+MOV N$神力值数 4
+#IF
+CheckContainsText <$KILLMONNAME> 迷失
+#ACT
+MOV N$神力值数 5
+#IF
+CheckContainsText <$KILLMONNAME> 沉默
+#ACT
+MOV N$神力值数 7
+#IF
+CheckContainsText <$KILLMONNAME> 封印
+#ACT
+MOV N$神力值数 10
+#IF
+CheckContainsText <$KILLMONNAME> 黑暗
+#ACT
+MOV N$神力值数 15
+#IF
+CheckContainsText <$KILLMONNAME> 铁血
+#ACT
+MOV N$神力值数 20
+#IF
+CheckContainsText <$KILLMONNAME> [王]
+#ACT
+MOV N$神力值数 30
+#IF
+CheckContainsText <$KILLMONNAME> [帝]
+#ACT
+MOV N$神力值数 40
+#IF
+CheckContainsText <$KILLMONNAME> 封天大魔王
+#ACT
+MOV N$神力值数 50 
+
+#IF
+#ACT
+MOV N$上古数 <$STR(N$神力值数)>
+
+#IF
+LARGE U3 1
+SMALL U3 4
+#ACT
+MUL N$上古数 2
+#IF
+EQUAL U3 4
+#ACT
+MUL N$上古数 3
+#IF
+LARGE U3 4
+#ACT
+MUL N$上古数 5
+
+; 神力值上限999万
+#IF
+CHECKMONEY 神力值 < 9999999
+#ACT
+MONEY 神力值 + <$STR(N$上古数)>
+
+
+; 神石满级下面的都不要执行了
+#IF
+LARGE U2 99
+#ACT
+BREAK
+
+; 背包空间不足 禁止升级
+#IF
+NOT CHECKBAGSIZE 10
+#ACT
+BREAK
+
+#IF
+LARGE U2 0
+#ACT
+MOV N$升级标识 0
+ReadCacheConfigFileItem ..\QuestDiary\01配置项\神石配置项.ini 神石配置 <$STR(U2)> N$神石需求
+
+
+; 自动升级神石   满级神石升级
+#IF
+LARGE U3 6
+EQUAL U2 99
+#ACT
+Money 神力值 - <$STR(N$神石需求)>
+Inc U2 1
+Takew <$DRUM> 1
+MOV T4 源石
+GiveOnItem 14 源石 1
+SENDMSG 9 恭喜您，成功升级源石！
+SENDMOVEMSG 0 251 0 460 1 恭喜玩家：【<<$UserName>/FCOLOR=250>】成功升级源石！
+
+;自动升级神石
+#IF
+LARGE U3 6
+LARGE u2 0
+CheckMoney 神力值 ? <$STR(N$神石需求)>
+#ACT
+MOV N$升级标识 1
+Money 神力值 - <$STR(N$神石需求)>
+Inc U2 1
+Takew <$DRUM> 1
+MOV T4 神石(Lv<$Str(U2)>)
+GiveOnItem 14 神石(Lv<$Str(U2)>) 1
+SENDMSG 9 恭喜您，成功升级神石！
+SENDMOVEMSG 0 251 0 460 1 恭喜玩家：【<<$UserName>/FCOLOR=250>】成功升级神石！
+
+#IF
+EQUAL U50 7
+EQUAL N$升级标识 1
+#ACT
+NEWCHANGETASK 7 <$STR(U2)>
+
+
+[@山海奎牛击杀专属奖励]
+#IF
+NOT EQUAL N15 1
+#ACT
+BREAK
+
+#IF
+#ACT
+MOV N15 0
+MAILGIVE 元宝 10
+SENDMAIL 233 山海奎牛专属奖励 穿戴<[绝版山海夔牛]/FCOLOR=250>玩具击杀山海奎牛获得专属奖励，请在附件中领取奖励
+BREAK
+
+
+
+[@进入废墟遗迹]
+#IF
+EQUAL N$CHECK 1
+#ACT
+MOV N$CHECK 0
+MAPMOVE fxyj 41 43 3
+GuildNoticeMsg 250 11 玩家{<$username>|70:0:1}进入了{废墟遗迹。|253:0:1}
+
+; 如果废墟遗迹没有怪物则刷新一只BOSS
+#IF
+CheckMonMap fxyj 1
+#ELSEACT
+MOV S$BOSS奖池 山海圣兽※白虎#6|山海圣兽※朱雀#6|山海圣兽※玄武#6|
+INC S$BOSS奖池 山海圣兽※青龙#7|废墟魔王·[福利]#15|◇◇◇上古异兽·山海奎牛◇◇◇#15|
+INC S$BOSS奖池 ◇◇◇上古异兽·山海朱厌◇◇◇#15|◇◇◇蛮荒兽界·狂暴巨魔◇◇◇#10|
+INC S$BOSS奖池 ◇◇◇蛮荒兽界·邪恶怨灵◇◇◇#10|◇◇◇地狱鬼界·黑暗骑士◇◇◇#5|●●●●剑甲守护神●●●●#5
+RANSJSTR <$STR(S$BOSS列表)> 1 3 S$刷新BOSS S$奖池剩余
+MonGenEx fxyj 41 43 <$STR(S$刷新BOSS)> 1 1 0 249
+BREAK
+
+
+
+
+[@确定进入奇遇]
+#IF
+EQUAL N$CHECK 1
+#ACT
+MOV N$CHECK 0
+INC J13 1
+ADDSTRVALUE Z2 map <$map>
+ADDSTRVALUE Z2 xxx <$x>
+ADDSTRVALUE Z2 yyy <$y>
+ADDMIRRORMAP yehongwei36 <$username>buff 奇遇幻境 1800 tjp
+MonGenEx <$username>buff 87 68 奇遇·山海鸣蛇 2 1 0 249
+MAPMOVE <$username>buff 87 69 1
+GuildNoticeMsg 250 11 玩家{[<$username>]|70::0:1}进入了{奇遇场景。|70::0:1}
+BREAK
+
+;----------------神力值变化触发
+[@MoneyChange10]
+; 切割石头低于100级触发
+#IF
+SMALL U2 100
+#ACT
+#CALL [\主界面基础按钮\主界面基础按钮QM.txt] @切割经验刷新
+#ELSEACT
+BREAK
+
+; 跨服地图不给提示
+#IF
+CHECKKUAFU
+#ACT
+BREAK
+
+; 神石升级提示
+#IF
+LARGE U2 0
+SMALL U2 100
+CHECKMONEY 神力值 ? <$STR(N$神石需求)>
+#ACT
+ADDBUTSHOW 1 升级神石 @开始提升神石
+#ELSEACT
+DELBUTSHOW 1
+
+;-------任务3获取十点神力值
+#OR
+EQUAL U50 1
+EQUAL U50 3
+#ACT
+NEWCHANGETASK 3 <$MONEY(神力值)>
+
+
+; 货币超限制 提示
+[@MoneyChange1]
+#IF
+CHECKMONEY 元宝 ? 2000000000
+#ACT
+SENDMSG 9 当前背包携带元宝过多
+BREAK
+
+; 货币超限制 提示
+[@MoneyChange2]
+#IF
+CHECKMONEY 金刚石 ? 2000000000
+#ACT
+SENDMSG 9 当前背包携带金刚石过多
+BREAK
+
+; 荣誉值刷新 判断是否可领取新区限时累充
+[@MoneyChange9]
+#IF
+LARGE <$GAMEID> 3268
+#ACT
+#CALL [\03自定义按钮\新服首发礼包.txt] @首发红点检测
+
+; 战令经验 战令等级 端午战令
+[@MoneyChange27]
+#IF
+SMALL U126 50
+NOT SMALL <$CURRMONEY> 10
+#ACT
+FORMULATION <$CURRMONEY>%10 N$剩余经验
+FORMULATION (<$CURRMONEY>-<$STR(N$剩余经验)>)/10 N$战令升级
+
+FORMULATION <$STR(U126)>+<$STR(N$战令升级)> N$预计等级
+VAR_CHECK <$STR(N$预计等级)> > 50 50 <$STR(N$预计等级)> U126
+MONEY 战令经验 = <$STR(N$剩余经验)>
+SENDMSG 9 战令升级，当前战令<$STR(U126)>级
+BREAK
+
+
+[@ItemDamage1]
+; #IF
+; #ACT
+; SENDMSG 9 持久变化
+
+; 杀怪30刀 触发检测
+[@战力地图检测]
+#IF
+LARGE <$GetTypeBRow(cfg_zhanlimap_map,0,<$map>)> 0
+SMALL U120 <$cfg_zhanlimap_map(<$GetTypeBRow(cfg_zhanlimap_map,0,<$map>)>_2)>
+#ACT
+GOTO @读秒回城
+SENDMSG 9 战力已不满足当前地图条件。
+BREAK
+
+; 蛇沼鬼蜮 检测
+#IF
+ISONMAP SZGY
+SMALL <$MAXDC> 118000
+#ACT
+GOTO @读秒回城
+SENDMSG 9 攻击力已不满足当前地图条件。
+BREAK
+
+; 王者禁地 检测
+#IF
+#ACT
+MOV N$DRESS_NeedLevel 0
+MOV N$WEAPON_NeedLevel 0
+GetDBItemFieldValue <$DRESS> NeedLevel  N$DRESS_NeedLevel
+GetDBItemFieldValue <$WEAPON> NeedLevel N$WEAPON_NeedLevel
+
+#IF
+ISONMAP wzjd
+SMALL N$DRESS_NeedLevel 105
+SMALL N$WEAPON_NeedLevel 105
+#ACT
+GOTO @读秒回城
+SENDMSG 9 当前已不满足当此图进入条件。
+BREAK
+
+; 沙漠废墟
+#IF
+ISONMAP dgfx
+NOT EQUAL <$HOUR> 12
+#ACT
+GOTO @读秒回城
+SENDMSG 9 活动已结束
+BREAK
+
+
+
+;-------↓↓↓↓↓↓↓↓↓-----大退触发-----↓↓↓↓↓↓↓↓↓-----------------------
+;-------↓↓↓↓↓↓↓↓↓-----大退触发-----↓↓↓↓↓↓↓↓↓-----------------------
+;-------↓↓↓↓↓↓↓↓↓-----大退触发-----↓↓↓↓↓↓↓↓↓-----------------------
+[@PlayOffLine]
+; 清除盒子称号
+#OR
+ISONMAP DDYZ
+EQUAL <$GAMEID> 1
+CHECKLEVELEX < 100
+#ACT
+BREAK
+
+#IF
+CHECKKUAFU
+#ACT
+BREAK
+
+#IF
+CHECKLEVELEX ? 500
+SMALL <$USERCOUNT> 100
+#ACT
+MAPMOVE RXSC042 331 330 10
+OFFLINEPLAY 65535
+BREAK
+
+;-------↓↓↓↓↓↓↓↓↓-----小退触发-----↓↓↓↓↓↓↓↓↓-----------------------
+;-------↓↓↓↓↓↓↓↓↓-----小退触发-----↓↓↓↓↓↓↓↓↓-----------------------
+;-------↓↓↓↓↓↓↓↓↓-----小退触发-----↓↓↓↓↓↓↓↓↓-----------------------
+[@PlayReconnection]
+
+
+
+;宠物被魔法攻击触发
+[@MagicStruckPetEx]
+#IF
+#ACT
+STOP
+BREAK
+
+;宠物被物理攻击触发
+[@StruckPetEx]
+#IF
+#ACT
+STOP
+BREAK
+
+;宠物物理攻击触发
+[@AttackPetEx]
+#IF
+#ACT
+STOP
+BREAK
+
+; 领取邮件道具 领取邮件物品
+[@GetMailItem] 
+#OR
+EQUAL <$LASTMAILOPTYPEID> 142
+EQUAL <$LASTMAILOPTYPEID> 3214
+#ACT
+LINKITEMBYMAKEINDEX <$NEWBAGITEMID>
+MOV S$BUFF奖池 魔法转换3#80|道术转换3#30|财富3#100|切割3#100|福源3#100|鞭尸3#100|奇遇3#100|迅捷3#10|重伤3#80|破绽3#50|骸骨3#80|点燃3#50|凯旋3#50
+RANSJSTR <$STR(S$BUFF奖池)> 1 3 S$BUFF1 S$BUFF奖池
+RANSJSTR <$STR(S$BUFF奖池)> 1 3 S$BUFF2 S$BUFF奖池
+RANSJSTR <$STR(S$BUFF奖池)> 1 3 S$BUFF3 S$BUFF奖池
+GetDBItemFieldValue <$STR(S$BUFF1)> idx N$BUFF1
+GetDBItemFieldValue <$STR(S$BUFF2)> idx N$BUFF2
+GetDBItemFieldValue <$STR(S$BUFF3)> idx N$BUFF3
+DRILLHOLE -1 0 1
+DRILLHOLE -1 1 1
+DRILLHOLE -1 2 1
+SOCKETABLEITEM -1 0 <$STR(N$BUFF1)>
+SOCKETABLEITEM -1 1 <$STR(N$BUFF2)>
+SOCKETABLEITEM -1 2 <$STR(N$BUFF3)>
+UpDateBoxItem -1
+
+
+
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+SENDMSG 9 物品ID：<$NEWBAGITEMID>|邮件ID：<$LASTMAILOPTYPEID>
+
+
+[@强化7级BUFF]
+#IF
+NOT EQUAL N$CHECK 7
+#ACT
+get_post_data S$上报数据 {"gevent":"强化成功","gvalue":"<$STR(N$当前等级)>","desc":"<$WEAPON>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+#IF
+EQUAL N$CHECK 7
+#ACT
+MOV N$CHECK 0
+MOV S$BUFF统计
+MOV S$巅峰奖池 巅峰1#20|巅峰2#18|巅峰3#16|巅峰4#13|巅峰5#12|巅峰6#8|巅峰7#7|巅峰8#3|巅峰9#2|巅峰10#1
+MOV S$BUFF奖池 魔法转换#80|道术转换#30|财富#100|切割#100|福源#100|鞭尸#100|奇遇#100|迅捷#10|重伤#80|破绽#50|骸骨#80|点燃#50|凯旋#50
+MOV S$随机等级 1#80|2#50|3#15
+RANSJSTR <$STR(S$BUFF奖池)> 1 3 S$BUFF1 S$BUFF奖池
+RANSJSTR <$STR(S$BUFF奖池)> 1 3 S$BUFF2 S$BUFF奖池
+RANSJSTR <$STR(S$BUFF奖池)> 1 3 S$BUFF3 S$BUFF奖池
+RANSJSTR <$STR(S$随机等级)> 1 3 S$BUFFLV1 S$BUFFLV
+RANSJSTR <$STR(S$随机等级)> 1 3 S$BUFFLV2 S$BUFFLV
+RANSJSTR <$STR(S$随机等级)> 1 3 S$BUFFLV3 S$BUFFLV
+RANSJSTR <$STR(S$巅峰奖池)> 1 3 S$BUFFLV4 S$BUFFLV
+GetDBItemFieldValue <$STR(S$BUFF1)><$STR(S$BUFFLV1)> idx N$BUFF1
+GetDBItemFieldValue <$STR(S$BUFF2)><$STR(S$BUFFLV2)> idx N$BUFF2
+GetDBItemFieldValue <$STR(S$BUFF3)><$STR(S$BUFFLV3)> idx N$BUFF3
+GetDBItemFieldValue <$STR(S$BUFFLV4)> idx N$BUFF4
+SENDMSGNEW 146 0 不可思议！玩家<[<$username>]/FCOLOR=253>成功将<[<$WEAPON>]/FCOLOR=70>强化到+7，属性暴涨... 1 5
+
+; 6015版本 概率获得空BUFF
+#IF
+LARGE N$BUFF1 0
+RANDOMEX 8000 10000
+EQUAL <$GAMEID> 6015
+#ACT
+DRILLHOLE 1 0 1
+SOCKETABLEITEM 1 0 <$STR(N$BUFF1)>
+INC S$BUFF统计 <$STR(S$BUFF1)><$STR(S$BUFFLV1)>|
+
+; 大极品最少给1个BUFF
+#IF
+LARGE N$BUFF1 0
+NOT EQUAL <$GAMEID> 6015
+#ACT
+DRILLHOLE 1 0 1
+SOCKETABLEITEM 1 0 <$STR(N$BUFF1)>
+INC S$BUFF统计 <$STR(S$BUFF1)><$STR(S$BUFFLV1)>|
+
+#IF
+LARGE N$BUFF2 0
+RANDOMEX 3333 10000
+#ACT
+DRILLHOLE 1 1 1
+SOCKETABLEITEM 1 1 <$STR(N$BUFF2)>
+INC S$BUFF统计 <$STR(S$BUFF2)><$STR(S$BUFFLV2)>|
+
+#IF
+LARGE N$BUFF3 0
+RANDOMEX 1000 10000
+#ACT
+DRILLHOLE 1 2 1
+SOCKETABLEITEM 1 2 <$STR(N$BUFF3)>
+INC S$BUFF统计 <$STR(S$BUFF3)><$STR(S$BUFFLV3)>|
+
+; 8%概率获得等级BUFF
+#IF
+LARGE N$BUFF4 0
+RANDOMEX 800 10000
+#ACT
+DRILLHOLE 1 3 1
+SOCKETABLEITEM 1 3 <$STR(N$BUFF4)>
+INC S$BUFF统计 <$STR(S$BUFFLV4)>|
+#CALL [\04人物属性\刷新神器等级.txt] @刷新角色等级
+
+; 关闭多余的宝石孔
+#IF
+NOT CHECKSOCKETABLEITEM 1 0 N1 S1
+#ACT
+DRILLHOLE 1 0 0
+#IF
+NOT CHECKSOCKETABLEITEM 1 1 N1 S1
+#ACT
+DRILLHOLE 1 1 0
+#IF
+NOT CHECKSOCKETABLEITEM 1 2 N1 S1
+#ACT
+DRILLHOLE 1 2 0
+#IF
+NOT CHECKSOCKETABLEITEM 1 3 N1 S1
+#ACT
+DRILLHOLE 1 3 0
+
+#IF
+#ACT
+GET_POST_DATA S$上报数据 {"gevent":"强化成功","gvalue":"<$STR(N$当前等级)>","desc":"<$WEAPON>|<$STR(S$BUFF统计)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+[@武器强化激活]
+#IF
+#ACT
+GETITEMADDVALUE 1 40 N$强化概率 0
+GETITEMADDVALUE 1 41 N$当前等级 0
+CHANGEITEMADDVALUE 1 40 = 0
+CHANGEITEMADDVALUE 1 41 = 0
+GetDBItemFieldValue <$WEAPON> NeedLevel N$WEAPONLEVEL
+INC N$当前等级 1
+
+#IF
+SMALL N$WEAPONLEVEL 100
+#ACT
+FORMULATION <$STR(N$当前等级)>*30 N$当前强化属性
+#ELSEACT
+FORMULATION (<$STR(N$当前等级)>*<$STR(N$当前等级)>*10+(<$STR(N$WEAPONLEVEL)>-100+1)*(<$STR(N$当前等级)>*10))*1.5 N$当前强化属性
+
+
+; 暗坑 最高50%概率将强化概率降低30%
+#IF
+SMALL N$强化概率 1000
+RANDOMEX <$STR(N$当前等级)> 15
+#ACT
+DIV N$强化概率 3
+
+#IF
+CHECK [110] 0
+EQUAL N$当前等级 7
+#ACT
+SET [110] 1
+MAILGIVE 绝世神兵[限时] 1
+SENDMAIL 3214 铁匠的礼物 恭喜你武器首次尝试+7，无论成功失败相信都是一种挑战。赠送一把三红BUFF武器，你拿去试试。
+
+
+
+
+#IF
+RANDOMEX <$STR(N$强化概率)> 1000
+#ACT
+ChangeItemUpgradeCount 1 = <$STR(N$当前等级)>
+ChangeItemName 1 <$WEAPON>
+CHANGECUSTOMITEMTEXT 1 [强化属性]\<$cfg_强化祭品概率(<$STR(N$当前等级)>_13)> 1
+CHANGECUSTOMITEMTEXTCOLOR 1 70 1
+
+abil_ex_bind 1 0 250 4 31 0 0 1 1
+abil_ex_bind 1 1 254 6 32 0 1 1 1
+abil_ex_bind 1 2 253 8 33 0 2 1 1
+
+CHANGECUSTOMITEMVALUE 1 0 = <$STR(N$当前强化属性)> 1
+CHANGECUSTOMITEMVALUE 1 1 = <$STR(N$当前强化属性)> 1
+CHANGECUSTOMITEMVALUE 1 2 = <$STR(N$当前强化属性)> 1
+
+MOV N$CHECK <$STR(N$当前等级)>
+GOTO @强化7级BUFF
+SENDMSG 9 武器强化成功
+BREAK
+
+; 失败给BUFF
+#IF
+EQUAL N$当前等级 5
+#ACT
+ADDBUFF 80000
+SENDMSGNEW 146 0 太遗憾了！玩家<[<$username>]/FCOLOR=253>将<[<$WEAPON>强化到+5]/FCOLOR=70>的时候失败，武器破碎了。 1 3
+
+#IF
+EQUAL N$当前等级 6
+#ACT
+INC U17 1
+ADDBUFF 80001
+SENDMSGNEW 146 0 太遗憾了！玩家<[<$username>]/FCOLOR=253>将<[<$WEAPON>强化到+6]/FCOLOR=70>的时候失败，武器破碎了。 1 4
+
+#IF
+EQUAL N$当前等级 7
+#ACT
+INC U17 1
+ADDBUFF 80002
+SENDMSGNEW 146 0 太遗憾了！玩家<[<$username>]/FCOLOR=253>将<[<$WEAPON>强化到+7]/FCOLOR=70>的时候失败，武器破碎了。 1 5
+
+#IF
+#ACT
+MOV S$WQ <$WEAPON>
+TAKEW <$WEAPON> 1
+SENDMSG 9 强化失败，武器破碎
+
+get_post_data S$上报数据 {"gevent":"强化失败","gvalue":"<$STR(N$当前等级)>","desc":"<$STR(S$WQ)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+BREAK
+; 攻击前触发
+[@AttackDamage]
+#IF
+CHECKITEMADDVALUE 1 40 > 0
+#ACT
+STOPAutoPlayGame
+GOTO @武器强化激活
+BREAK
+
+
+#IF
+#ACT
+MOV N$破绽机会 0
+MUL N$打怪切割 <$STR(N$装备刀魂)> <$MAXDC>
+DIV N$打怪切割 <$STR(N$切割衰减)>
+INC N$打怪切割 2
+
+#IF
+CHECKITEMW 战神の帝 1
+CHECKCURRTARGETRACE = 60
+EQUAL <$CURRRTARGETNAME> 卧龙·风云
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+#IF
+CHECKITEMW 精灵の翔 1
+CHECKCURRTARGETRACE = 60
+EQUAL <$CURRRTARGETNAME> 卧龙·新月
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+#IF
+CHECKITEMW 守护の神 1
+CHECKCURRTARGETRACE = 60
+EQUAL <$CURRRTARGETNAME> 卧龙·御风
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+#IF
+CHECKITEMW 傀儡の隐 1
+CHECKCURRTARGETRACE = 60
+EQUAL <$CURRRTARGETNAME> 卧龙·青城
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+#IF
+CHECKITEMW 凤凰の飞 1
+CHECKCURRTARGETRACE = 60
+EQUAL <$CURRRTARGETNAME> 卧龙·飞鸿
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+#IF
+CHECKITEMW 诅咒の亡 1
+CHECKCURRTARGETRACE = 60
+EQUAL <$CURRRTARGETNAME> 卧龙·斩浪
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+
+#IF
+ISONMAP wlsz
+CHECKCURRTARGETRACE = 60
+CHECKITEMW 「神器」メ卧龙圣物 1
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+
+#IF
+ISONMAP ly
+NOT EQUAL <$SNECKLACE>
+CHECKCURRTARGETRACE = 60
+#ACT
+M.HUMANHP - <$STR(N$打怪切割)> 14
+
+; 船长BUFF，小怪存在，船长无敌 刀刀恢复1%血量
+#IF
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 幽灵船长
+CheckMapSameMonCount <$MAP> 幽魂 > 0 1
+#ACT
+M.ADDHPPER + 1
+ChangeDamageValue 0 = 0
+BREAK
+
+; 镇天神龙BUFF，小怪存在，船长无敌强制1点伤害
+#IF
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 卧龙之魂·镇天神龙
+CheckMapSameMonCount <$MAP> 狼灵 > 0 1
+#ACT
+ChangeDamageValue 0 = 1
+BREAK
+
+; 2022年8月10日
+; 调整为打怪伤害衰减80%    
+#IF
+CHECKCURRTARGETRACE = 1
+LARGE <$DAMAGEVALUE> 500
+#ACT
+FORMULATION <$DAMAGEVALUE>*0.2 N1
+ChangeDamageValue 0 = <$STR(N1)>
+BREAK
+
+#IF
+NOT CHECKCURRTARGETRACE = 0
+#ACT
+BREAK
+
+; 重伤BUFF触发
+#IF
+HASBUFF 72001
+#ACT
+ChangeDamageValue 1 + 5
+<$CURRRTARGETNAME>.HUMANHP - 1 101
+BREAK
+; 重伤BUFF触发
+#IF
+HASBUFF 72002
+#ACT
+ChangeDamageValue 1 + 10
+<$CURRRTARGETNAME>.HUMANHP - 1 101
+BREAK
+; 重伤BUFF触发
+#IF
+HASBUFF 72003
+#ACT
+ChangeDamageValue 1 + 18
+<$CURRRTARGETNAME>.HUMANHP - 1 101
+BREAK
+
+; 检查冰冻、麻痹状态
+#OR
+<$CURRRTARGETNAME>.CHECKHUMANSTATE 7
+<$CURRRTARGETNAME>.CHECKHUMANSTATE 8
+#ACT
+MOV N$破绽机会 1
+
+; 破绽
+#IF
+HASBUFF 71011
+EQUAL N$破绽机会 1
+#ACT
+ChangeDamageValue 1 + 5
+<$CURRRTARGETNAME>.HUMANHP - 1 102
+BREAK
+; 破绽
+#IF
+HASBUFF 71012
+EQUAL N$破绽机会 1
+#ACT
+ChangeDamageValue 1 + 10
+<$CURRRTARGETNAME>.HUMANHP - 1 102
+BREAK
+; 破绽
+#IF
+HASBUFF 71013
+EQUAL N$破绽机会 1
+#ACT
+ChangeDamageValue 1 + 20
+<$CURRRTARGETNAME>.HUMANHP - 1 102
+BREAK
+
+; 暴击触发
+[@CritTrigger]
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+sendmsg 6 <$PARAM1>+<$SECOND>
+BREAK
+
+
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓攻击触发↓------------------------------------------------
+; 原则上攻击角色触发的BUFF，触发1次则终止后面的执行。
+[@Attack]
+#IF
+CHECKLEVELEX ? 41
+EQUAL <$HOUR> 21
+NOT ISONMAP Rxsc042
+CHECKUNDERWAR 沙巴克
+NOT CHECKCURRTARGETRACE = 0
+NOT CHECKCASTLEWARAREA 沙巴克
+#ACT
+MAPMOVE rxsc042 331 331 9
+SENDMSG 9 沙巴克攻城期间21:00-22:00，临时关闭野外地图
+BREAK
+
+
+#IF
+RANDOMEX <$CUSTABIL[200]> 10000
+#ACT
+GETITEMADDVALUE 3 41 N$神秘技能 1
+RELEASEMAGICEX <$STR(N$神秘技能)> 0 3 1
+
+
+
+; 工具服测试
+; #IF
+; EQUAL <$GAMEID> 1
+; EQUAL <$USERACCOUNT> 1489361
+; #ACT
+; <$CURRRTARGETNAME>.MAKEPOSION 12 3 10
+
+
+
+; 攻击状态赋值，定时器3  30秒清零
+; 这个状态清空后才可以自动挂机
+#IF
+#ACT
+MOV N$ATTACK 1
+INC N$攻击次数 1
+
+; 检测攻击次数的时候不执行下面
+#IF
+LARGE N$攻击次数 30
+#ACT
+MOV N$攻击次数 0
+DELAYGOTO 10 @战力地图检测
+BREAK
+
+#IF
+ISONMAP yybf
+#ACT
+BREAK
+
+; 攻击年兽记录，击杀后参与攻击均有BUFF
+#OR
+EQUAL <$CURRRTARGETNAME> 恭喜发财·年兽
+EQUAL <$CURRRTARGETNAME> 百倍爆率·【BOSS】
+#ACT
+MOV J29 1
+
+
+
+; 狂暴双毒
+#IF
+CHECK [2] 1
+CHECKCURRTARGETRACE = 1
+NOT EQUAL <$CURRRTARGETNAME> 卧龙之魂·镇天神龙
+NOT EQUAL <$CURRRTARGETNAME> ◇◇◇远古赤月·山海恶魔◇◇◇
+#ACT
+M.MAKEPOSION 0 30 10
+M.MAKEPOSION 1 30 10
+
+; 赤月怪中毒限制10秒
+#IF
+CHECK [2] 1
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> ◇◇◇远古赤月·山海恶魔◇◇◇
+#ACT
+M.MAKEPOSION 0 10 10
+M.MAKEPOSION 1 10 10
+
+; 卧龙怪中毒限制10秒
+#IF
+CHECK [2] 1
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 卧龙之魂·镇天神龙
+#ACT
+M.MAKEPOSION 0 10 5
+M.MAKEPOSION 1 10 5
+
+
+#IF
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 幽灵船长
+#ACT
+INC G16 1
+INC G17 1
+INC G18 1
+INC G19 1
+GOTO @幽灵船长触发
+BREAK
+
+#IF
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 卧龙之魂·镇天神龙
+#ACT
+GOTO @镇天神龙触发
+BREAK
+
+
+; 攻击BOSS类型怪物概率触发
+#IF
+CHECKCURRTARGETRACE = 1
+NOT EQUAL <$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)> -1
+RANDOMEX <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_2)> 1000
+#ACT
+MOV N$范围大小 <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_3)>
+MOV N$范围伤害 <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_4)>
+MOV N$触发效果 <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_5)>
+MOV N$效果属性 <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_6)>
+MOV N$检查状态 <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_7)>
+MOV N$目标类型 <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_8)>
+MOV N$播放特效 <$cfg_打怪触发伤害配置(<$GetTypeBRow(cfg_打怪触发伤害配置,1,<$CURRRTARGETNAME>)>_9)>
+M.RangeHarm <$X> <$Y> <$STR(N$范围大小)> <$STR(N$范围伤害)> <$STR(N$触发效果)> <$STR(N$效果属性)> <$STR(N$检查状态)> <$STR(N$目标类型)> <$STR(N$播放特效)>
+BREAK
+
+
+; 苍月地图部分怪物减免伤害
+#IF
+CHECKCURRTARGETRACE = 1
+LARGE <$GetTypeBRow(cfg_苍月地图免伤,1,<$MAP>)> 0
+LARGE <$GetTypeBRow(cfg_苍月地图免伤,2,<$CURRRTARGETNAME>)> 0
+#ACT
+MOV N$切割衰减 5
+#ELSEACT
+MOV N$切割衰减 2
+
+; 打怪切割
+#IF
+CHECKCURRTARGETRACE = 1
+SMALL <$GetTypeBRow(cfg_禁止切割怪,0,<$CURRRTARGETNAME>)> 0
+#ACT
+FORMULATION <$STR(N$装备刀魂)>*<$MAXDC>/<$STR(N$切割衰减)>+2 N$打怪切割
+M.HUMANHP - <$STR(N$打怪切割)> 14
+
+
+;渡劫吸血
+#IF
+NOT HASBUFF 60010
+NOT HASBUFF 60011
+NOT HASBUFF 60012
+NOT HASBUFF 60013
+CHECKCURRTARGETRACE = 1
+RANDOMEX <$CFG_渡劫吸血配置(<$STR(U37)>_1)> 200
+#ACT
+ADDBUFF <$CFG_渡劫吸血配置(<$STR(U37)>_3)>
+
+
+#OR
+HASBUFF 60011
+HASBUFF 60012
+HASBUFF 60013
+#ACT
+FORMULATION <$MAXDC>*<$cfg_渡劫吸血配置(<$STR(U37)>_2)>/100 N$吸血量
+HUMANHP + <$STR(N$吸血量)> 15
+
+#IF
+INSAFEZONE
+#ACT
+BREAK
+#IF
+P.INSAFEZONE
+#ACT
+BREAK
+
+
+; 不是攻击的角色则不执行
+#IF
+NOT CHECKCURRTARGETRACE = 0
+#ACT
+BREAK
+
+; 获取对方斗笠等级，判断是否可冰冻
+#IF
+CHECKCURRTARGETRACE = 0
+#ACT
+MOV S$对方斗笠
+GETHUMVAR <$CURRRTARGETNAME> S$对方斗笠 <$HAT>
+
+; 武器冰冻
+#IF
+EQUAL U70 0
+LARGE N$武器等级 89
+RANDOMEX <$STR(N$武器等级)> 5000
+NOT EQUAL S$对方斗笠 沉默斗笠(Lv100)
+#ACT
+GetDBItemFieldValue <$WEAPON> Price N$冷却时间
+FORMULATION <$UTCNOW8>+<$STR(N$冷却时间)> U70
+P.MAKEPOSION 12 3 10
+P.SENDMSG 9 被攻击冰冻，持续3秒。
+SENDMSG 6 你的攻击{使对方冰冻|249:0:1}，持续3秒。
+GOTO @BUFF状态ICON
+BREAK
+
+; 攻击角色
+#IF
+EQUAL U72 0
+LARGE N$蛛网概率 0
+RANDOMEX <$STR(N$蛛网概率)> 100
+#ACT
+MOV U72 <$UTCNOW8>
+INC U72 <$STR(N$蛛网冷却)>
+P.MAKEPOSION 13 3 65535
+P.SENDMSG 9 被攻击触发DEBUFF，角色被蛛网缠绕，持续3秒。
+SENDMSG 9 攻击触发BUFF，对方被<font color='#ff2e63'>蛛网缠绕</font>，持续3秒
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+#IF
+EQUAL U73 0
+LARGE N$禁锢概率 0
+RANDOMEX <$STR(N$禁锢概率)> 120
+#ACT
+MOV U73 <$UTCNOW8>
+INC U73 <$STR(N$禁锢冷却)>
+P.ChangeModeEx 11 5 1
+P.SENDMSG 9 被攻击触发DEBUFF，角色被禁锢，持续5秒。
+SENDMSG 9 攻击触发BUFF，对方被<font color='#ff2e63'>禁锢</font>，持续5秒。
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+#IF
+EQUAL U74 0
+LARGE N$电击概率 0
+RANDOMEX <$STR(N$电击概率)> 100
+#ACT
+MOV U74 <$UTCNOW8>
+INC U74 <$STR(N$电击冷却)>
+ReleaseMagicEX 11 0 1 1
+P.ADDHPPER - <$STR(N$电击伤害)>
+P.SENDMSG 9 被攻击触发DEBUFF，角色雷电术击中，并附加伤害。
+SENDMSG 9 攻击触发BUFF，对方被<font color='#ff2e63'>雷电术击中</font>，并附加伤害。
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+#IF
+LARGE N$掠夺概率 0
+RANDOMEX <$STR(N$掠夺概率)> 1000
+#ACT
+P.TAKE 盟重传送石 9999
+P.TAKE 随机传送石 9999
+P.SENDMSG 9 被攻击触发DEBUFF，传送道具被掠夺。
+SENDMSG 9 攻击触发BUFF，对方<font color='#ff2e63'>传送道具被掠夺</font>
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+[@镇天神龙触发]
+#IF
+RANDOMEX 1 99
+#ACT
+M.RANGEHARM <$X> <$Y> 7 5000000 1 4 0 1 56
+BREAK
+
+[@幽灵船长触发]
+#IF
+RANDOMEX 1 50
+#ACT
+MOV G16 0
+M.RANGEHARM <$X> <$Y> 7 3000000 1 4 0 1 56
+BREAK
+
+; 15070 红色闪电
+; 204 冰雨
+; 121 黄毒溅射
+; 114 十字斩
+; 105 火焰
+; 89 血祭
+
+#IF
+LARGE G17 200
+RANDOMEX 1 20
+#ACT
+MOV G17 0
+MAPMOVE <$MAP> 50 50 100
+SENDMSG 9 你被BOSS[幽灵船长]随机传送到本地图。
+BREAK
+
+#IF
+LARGE G18 300
+RANDOMEX 1 30
+CheckMapSameMonCount <$map> 幽魂 < 10 1
+#ACT
+MOV G18 0
+MOVR N$召唤数量 3 5
+MONGENEX <$MAP> <$X> <$Y> 幽魂 5 <$STR(N$召唤数量)> 0 222 幽魂 0
+SENDMSG 9 [幽灵船长]召唤怪物幽魂
+BREAK
+
+
+; 被攻击掉血前触发
+[@StruckDamage]
+; 骸骨降低被攻击收到的伤害
+#IF
+HASBUFF 72007
+#ACT
+CHANGEDAMAGEVALUE 1 - 5
+BREAK
+#IF
+HASBUFF 72008
+#ACT
+CHANGEDAMAGEVALUE 1 - 10
+BREAK
+#IF
+HASBUFF 72009
+#ACT
+CHANGEDAMAGEVALUE 1 - 25
+BREAK
+
+
+#IF
+NOT ISONMAP cytg
+#ACT
+BREAK
+
+#IF
+NOT CHECKCURRTARGETRACE = 1
+#ACT
+BREAK
+
+#IF
+NOT EQUAL <$CURRRTARGETNAME> ◇◇◇远古赤月·山海恶魔◇◇◇
+#ACT
+BREAK
+; 赤月地图人数越多伤害越高
+#IF
+ISONMAP cytg
+CheckMapHUMANCount cytg > 1
+#ACT
+M.RangeHarm <$x> <$y> 50 5000000 0 1 0 1 89
+BREAK
+
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓@被攻击触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+[@STRUCK]
+; #IF
+; EQUAL <$GAMEID> 1
+; #ACT
+; FORMULATION <$MAXHP>-<$HP> N$累计受到伤害
+; SENDMSG 6 伤害：<$STR(N$累计受到伤害)>
+
+
+
+#IF
+RANDOMEX 20 100
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 超级白野猪·麻痹·[全爆]
+#ACT 
+MAKEPOSION 5 2 6
+SENDMSG 6 你被怪物{[<$CURRRTARGETNAME>]|249:1:0}麻痹，持续2秒。
+BREAK
+
+#IF
+RANDOMEX 10 100
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 战斗鸡
+#ACT 
+MAKEPOSION 5 2 6
+SENDMSG 6 你被怪物{[<$CURRRTARGETNAME>]|249:1:0}麻痹，持续2秒。
+BREAK
+
+#IF
+RANDOMEX 10 100
+CHECKCURRTARGETRACE = 1
+EQUAL <$CURRRTARGETNAME> 幽灵船长
+#ACT 
+MAKEPOSION 12 2 6
+SENDMSG 6 你被怪物{[<$CURRRTARGETNAME>]|249:1:0}冰冻，持续2秒。
+BREAK
+
+
+; 被人物打，进入战斗状态 OnTimer2 扣除
+#IF
+CHECKCURRTARGETRACE = 0
+#ACT
+MOV N$PK 3
+
+
+
+#OR
+INSAFEZONE
+ISONMAP Rxsc042
+CHECKUNDERWAR 沙巴克
+#ACT
+BREAK
+
+; 非挂机状态不保护
+#IF
+EQUAL N$挂机状态 0
+#ACT
+BREAK
+
+; 未开启保护
+#IF
+CHECK [16] 0
+#ACT
+BREAK
+
+; 跨服地图保护不生效
+#IF
+CHECKKUAFU
+#ACT
+BREAK
+
+
+#IF
+EQUAL U39 0
+CHECKHPPER < <$STR(U16)>
+#ACT
+MOV N$PK 0
+MapMove Rxsc042 333 333 8
+SENDMSG 6 挂机保护生效，已将角色安全回城。
+BREAK
+
+#IF
+EQUAL U39 1
+CHECKHPPER < <$STR(U16)>
+#ACT
+MAP <$MAP>
+MOV T15 <$MAP>#<$X>#<$Y>
+SENDMSG 6 挂机保护生效，已在当前地图随机传送。
+DELAYGOTO 680 @延迟开始挂机
+BREAK
+
+
+
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓被魔法攻击触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+
+; [@MagTagFuncEx100086]
+; #IF
+; #ACT
+; SENDMSG 9 玩家<$param2>,释放的技能名字是<$MAGICNAME(<$param1>)>,技能ID是<$param1>
+
+; 烈火点燃BUFF
+[@MagSelfFunc26]
+#IF
+INSAFEZONE
+#ACT
+BREAK
+#IF
+P.INSAFEZONE
+#ACT
+BREAK
+
+#IF
+RANDOM 5
+HASBUFF 71017
+CHECKCURRTARGETRACE = 0
+#ACT
+P.ADDBUFF 72010
+SENDMSG 9 [点燃]BUFF触发，对方持续掉血
+BREAK
+#IF
+RANDOM 4
+HASBUFF 71018
+CHECKCURRTARGETRACE = 0
+#ACT
+P.ADDBUFF 72011
+SENDMSG 9 [点燃]BUFF触发，对方持续掉血
+BREAK
+#IF
+RANDOM 3
+HASBUFF 71019
+CHECKCURRTARGETRACE = 0
+#ACT
+P.ADDBUFF 72012
+SENDMSG 9 [点燃]BUFF触发，对方持续掉血
+BREAK
+
+[@MagicStruck]
+;#IF
+;#ACT
+;SetMagicDefPower 死亡之眼 100 1
+;SENDMSG 6 免疫死亡之眼！
+
+; #IF
+; #ACT
+; SENDMSG 6 255 253 你被怪物【<$CURRRTARGETNAME>】攻击了。使用魔法ID=<$CURRRUSEMAGICID>
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓杀人触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+[@KillPlay]
+; 凯旋BUFF冷却
+#IF
+HASBUFF 71000
+#ACT
+BREAK
+; 凯旋BUFF生效
+#IF
+HASBUFF 71020
+#ACT
+ADDHPPER + 5
+ADDBUFF 71000 20
+SENDMSG 9 [凯旋]击杀敌人后自身恢复血量5%
+BREAK
+#IF
+HASBUFF 71021
+#ACT
+ADDHPPER + 10
+ADDBUFF 71000 15
+SENDMSG 9 [凯旋]击杀敌人后自身恢复血量10%
+BREAK
+#IF
+HASBUFF 71022
+#ACT
+ADDHPPER + 20
+ADDBUFF 71000 10
+SENDMSG 9 [凯旋]击杀敌人后自身恢复血量20%
+BREAK
+
+;---------------------复活
+[@Revival]
+
+
+;--------------------------------------------------------------------------------------------------------
+;----------------------------------------------↓死亡触发↓------------------------------------------------
+;--------------------------------------------------------------------------------------------------------
+[@NextDie]
+#IF
+EQUAL N$复活概率 0
+#ACT
+BREAK
+
+#IF
+SMALL U71 <$UTCNOW8> 
+RANDOMEX <$STR(N$复活概率)> 100
+#ACT
+ChangeModeEx 23 1 1
+MOV U71 <$UTCNOW8>
+INC U71 <$STR(N$复活冷却)>
+SENDMSG 6 复活生效！您复活了
+SENDMSG 9 复活生效！您复活了
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+#IF
+LARGE N$复活概率 0
+#ACT
+SENDMSG 6 本次复活未成功触发。
+BREAK
+
+
+[@PlayDie]
+#IF
+NOT EQUAL S0
+#ACT
+MOV S$死亡装备掉落 <装备掉落：<$STR(S0)>/FCOLOR=146>
+#ELSEACT
+MOV S$死亡装备掉落 <无装备掉落/FCOLOR=7>
+
+#IF
+EQUAL N$爆胎爆胎 1
+#ACT
+MOV N$爆胎爆胎 0
+OPENHYPERLINK 7 2
+SendMail 1 死亡提示： \你因服用苍月秘药<[豹胎易经丸]/FCOLOR=253>药力不稳，导致暴毙！
+BREAK
+#SAY
+<Img|show=4|children={2,3,4,5,6}|bg=1|loadDelay=1|move=0|esc=1|img=private/revive/bg_swfh_1.png|reset=1>
+<RText|id=3|x=20.0|y=30.0|size=16|color=250|text=你因服用苍月秘药<[豹胎易经丸]>\药力不稳，导致暴毙！>
+<COUNTDOWN|id=5|x=129.0|y=70.0|time=10|count=1|size=16|color=249|link=@复活1>
+<Button|id=6|x=100.0|y=100.0|pimg=public/1900000652.png|nimg=public/1900000653.png|color=255|size=17|text=回城复活|link=@复活1>
+
+; 跨服地图不掉狂暴
+#IF
+CHECKKUAFU
+#ACT
+BREAK
+#SAY
+<Img|show=4|children={2,3,4,5,6}|bg=1|loadDelay=1|move=0|esc=1|img=private/revive/bg_swfh_1.png|reset=1>
+<RText|id=3|x=40.0|y=30.0|size=16|color=250|text=你被<<$CURRRTARGETNAME>>杀死了！>
+<COUNTDOWN|id=5|x=129.0|y=70.0|time=10|count=1|size=16|color=249|link=@跨服复活>
+<Button|id=6|x=100|y=100|color=255|nimg=public/1900000653.png|size=16|text=跨服复活|link=@跨服复活>
+
+
+
+; 卧龙秘境死亡触发DEBUFF
+#IF
+ISONMAP wlyj
+CheckMonMap wlyj 1
+#ACT
+GOTOLABELEX 2 @卧龙秘境传播瘟疫
+GuildNoticeMsg 250 11 玩家{[<$USERNAME>]|249:0:1}死亡，{瘟疫|249:0:1}开始传播 Map
+
+
+
+#IF
+Check [2] 1
+CHECKCURRTARGETRACE = 0
+#ACT
+Set [2] 0
+DEPRIVETITLE 超级狂暴
+#Call [\04人物属性\人物倍攻.txt] @人物倍攻
+#Call [\04人物属性\称号刷新.txt] @刷新称号
+sethumvar <$KILLER> S$死亡者 <$username>
+<$KILLER>.GOTO @击杀者触发获得奖励
+
+
+; 攻沙期间，在攻沙范围，延迟3秒自动复活
+#IF
+CHECKUNDERWAR 沙巴克
+CHECKCASTLEWARAREA 沙巴克
+#ACT
+; SendMail 1 死亡提示： 你在<[<$MapTitle>-<$X>.<$Y>]/FCOLOR=222>被<<$CURRRTARGETNAME>/FCOLOR=222>杀死了！\<$STR(S$死亡装备掉落)>
+SendMail 1 死亡提示： 你在<[<$MapTitle>-<$X>.<$Y>]/FCOLOR=222>被<<$CURRRTARGETNAME>/FCOLOR=222>杀死了！
+BREAK
+#SAY
+<Img|show=4|children={2,3,4,5,6}|bg=1|loadDelay=1|move=0|esc=1|img=private/revive/bg_swfh_1.png|reset=1>
+<RText|id=3|x=40.0|y=30.0|size=16|color=250|text=你被<<$CURRRTARGETNAME>>杀死了！>
+<COUNTDOWN|id=5|x=129.0|y=70.0|time=4|count=1|size=16|color=249|link=@复活1>
+<Button|id=6|x=140.0|y=120.0|nimg=public/alpha_1px.png|color=151|size=17|text=等待自动复活>
+
+; 普通复活
+#IF
+#ACT
+; SendMail 1 死亡提示： 你在<[<$MapTitle>-<$X>.<$Y>]/FCOLOR=222>被<<$CURRRTARGETNAME>/FCOLOR=222>杀死了！\<$STR(S$死亡装备掉落)>
+SendMail 1 死亡提示： 你在<[<$MapTitle>-<$X>.<$Y>]/FCOLOR=222>被<<$CURRRTARGETNAME>/FCOLOR=222>杀死了！
+#SAY
+<Img|show=4|children={2,3,4,5,6}|bg=1|loadDelay=1|move=0|esc=1|img=private/revive/bg_swfh_1.png|reset=1>
+<RText|id=3|x=40.0|y=30.0|size=16|color=250|text=你被<<$CURRRTARGETNAME>>杀死了！>
+<COUNTDOWN|id=5|x=129.0|y=70.0|time=10|count=1|size=16|color=249|link=@复活1>
+<Button|id=6|x=100.0|y=100.0|pimg=public/1900000652.png|nimg=public/1900000653.png|color=255|size=17|text=回城复活|link=@复活1>
+
+
+[@击杀者触发获得奖励]
+#IF
+LARGE U12 <$UTCNOW8>
+#ACT
+MOV N$狂暴冷却 <$STR(U12)>
+DEC N$狂暴冷却 <$UTCNOW8>
+SENDMSG 9 获得狂暴奖励冷却时间未到，本次未能获得狂暴奖励；剩余冷却时间<$STR(N$狂暴冷却)>秒
+SENDMSG 6 获得狂暴奖励冷却时间未到，本次未能获得狂暴奖励；剩余冷却时间<$STR(N$狂暴冷却)>秒
+SendCenterMsg 254 11 <【<$username>】/FCOLOR=242>击杀拥有<[狂暴之力]/FCOLOR=151>的<【<$STR(S$死亡者)>】/FCOLOR=249>！ 1 2
+BREAK
+
+
+#IF
+#ACT
+MOV U12 <$UTCNOW8>
+INC U12 300
+SENDMSG 9 你成功下掉对方狂暴，获得了2万元宝
+Money 元宝 + 20000
+SendCenterMsg 254 11 <【<$username>】/FCOLOR=242>击杀拥有<[狂暴之力]/FCOLOR=151>的<【<$STR(S$死亡者)>】/FCOLOR=249>,获得了<2万元宝/FCOLOR=253>赏金！ 1 2
+SENDMSG 0 〖<$username>〗在<$MAPTITLE>干死了〖<$STR(S$死亡者)>〗! 1 2
+BREAK
+
+
+
+
+[@复活1]
+#IF
+HASBUFF 90000
+#ACT
+DELBUFF 90000
+
+; 沙巴克成员在攻城范围复活
+#IF
+ISCASTLEGUILD
+CHECKCASTLEWARAREA 沙巴克
+#ACT
+REALIVE
+MapMove rxsc806 652 297 3
+HUMANHP = <$MaxHp>
+HUMANMP = <$MaxMp>
+CLEARDELAYGOTO 1
+BREAK
+
+; 沙巴克成员在皇宫复活
+#IF
+ISONMAP rxsc807
+ISCASTLEGUILD
+#ACT
+REALIVE
+MapMove rxsc806 652 297 3
+HUMANHP = <$MaxHp>
+HUMANMP = <$MaxMp>
+CLEARDELAYGOTO 1
+BREAK
+
+;普通复活
+#IF
+#ACT
+REALIVE
+HUMANHP = <$MaxHp>
+HUMANMP = <$MaxMp>
+MapMove Rxsc042 333 333 5
+CLEARDELAYGOTO 1
+BREAK
+
+[@跨服复活]
+#IF
+CHECKKUAFU
+#ACT
+REALIVE
+HUMANHP = <$MaxHp>
+HUMANMP = <$MaxMp>
+MapMove kuafu02 500 480 5
+CLEARDELAYGOTO 1
+SENDMSG 9 你已在跨服地图复活点复活。
+SENDMSG 6 你已在跨服地图复活点复活。
+BREAK
+
+;--------------------------------------------------------------------------------------------------------------------------------
+
+
+;-------↓↓↓↓↓↓↓↓↓-----升级触发-----↓↓↓↓↓↓↓↓↓-----------------------
+[@PlayLevelUp]
+#IF
+ISONMAP em000
+CHECKLEVELEX ? 40
+#ACT
+NEWDELETETASK 2
+MOV U50 3
+NEWPICKTASK 3
+OPENNPCSHOWEX 15 5 5
+SETNPCEFFECT 15 5056 1 100
+
+
+; 挂接QQ群，客服QQ
+#IF
+CHECKLEVELEX ? 200
+SMALL <$GAMEID> 3269
+#ACT
+NEWPICKTASK 6
+
+; 进阶任务 武器强化
+#IF
+EQUAL U50 99
+CHECKLEVELEX ? 600
+#ACT
+NEWPICKTASK 22
+
+
+; 等级刷新
+#IF
+NOT CHECKLEVELEX = <$HUMAN(等级数)>
+#ACT
+CALCVAR HUMAN 等级数 = <$LEVEL>
+SAVEVAR HUMAN 等级数
+
+
+; 调用智能提示
+#IF
+CHECKLEVELEX ? 150
+CHECKLEVELEX < 480
+#ACT
+FORMULATION <$UTCNOW8>-<$STR(N$提示冷却)> N$冷却计算EX
+
+#IF
+CHECKLEVELEX ? 150
+CHECKLEVELEX < 480
+LARGE N$冷却计算EX 480
+#ACT
+MOV N$提示冷却 <$UTCNOW8>
+DELAYGOTO 10 @智能提示
+
+
+#IF
+CHECKLEVELEX = 500
+#ACT
+Gmexecute ReleaseShutup <$USERNAME>
+BREAK
+
+[@StdModeFunc120]
+#IF
+#ACT
+CHANGEPKPOINT = 0
+SENDMSG 9 你的PK点数已经清除。
+BREAK
+
+
+[@StdModeFunc736]
+#IF
+NOT CHECKITEM 跨年金蛋 1
+#ACT
+BREAK
+
+#IF
+#ACT
+MOV S$权重结果
+MOV S$权重奖池 元宝+100000+200000#270|金刚石+50000+100000#270|技能包+1+4#80|项链保护卷+1+4#80|沉默水晶+1+4#80|仙灵珠+1+3#80|天赋神石+1+3#80|卧龙手书+1+2#50|黑铁矿+1+2#50
+
+RANSJSTR <$STR(S$权重奖池)> 1 3 S$权重结果 S$奖池剩余
+GETVALIDSTRSUPER <$STR(S$权重结果)> + S$分割TEXT_
+MOVR N$奖励数量 <$STR(S$分割TEXT_2)> <$STR(S$分割TEXT_3)>
+GetDBItemFieldValue <$STR(S$分割TEXT_1)> idx N$道具类型
+SENDMSG 9 打开[跨年金蛋]获得[<$STR(S$分割TEXT_1)>*<$STR(N$奖励数量)>]
+
+#IF
+SMALL N$道具类型 100
+#ACT
+money <$STR(S$分割TEXT_1)> + <$STR(N$奖励数量)>
+BREAK
+
+#IF
+#ACT
+GIVE <$STR(S$分割TEXT_1)> <$STR(N$奖励数量)>
+BREAK
+
+
+
+[@StdModeFunc735]
+#IF
+NOT CHECKITEM 圣诞礼物 1
+#ACT
+BREAK
+
+#IF
+#ACT
+MOV S$权重结果
+MOV S$权重奖池 元宝+10000+20000#200|金刚石+5000+10000#100|修炼石+10+20#110|觉醒石+10+20#110|命运水晶+2+5#110|技能书页+1+1#110|活跃+1+1#50|鹤嘴锄+1+1#50|狂暴丹+1+1#50|平安铃铛+1+1#100|玩具礼盒+1+1#10
+
+#IF
+SMALL G39 5
+RANDOMEX 1 500
+#ACT
+INC S$权重奖池 |66元充值券+1+2#10
+
+
+#IF
+#ACT
+RANSJSTR <$STR(S$权重奖池)> 1 3 S$权重结果 S$奖池剩余
+GETVALIDSTRSUPER <$STR(S$权重结果)> + S$分割TEXT_
+MOVR N$奖励数量 <$STR(S$分割TEXT_2)> <$STR(S$分割TEXT_3)>
+GetDBItemFieldValue <$STR(S$分割TEXT_1)> idx N$道具类型
+SENDMSG 9 打开圣诞礼物获得[<$STR(S$分割TEXT_1)>*<$STR(N$奖励数量)>]
+
+#IF
+SMALL N$道具类型 100
+#ACT
+money <$STR(S$分割TEXT_1)> + <$STR(N$奖励数量)>
+BREAK
+
+#IF
+#ACT
+GIVE <$STR(S$分割TEXT_1)> <$STR(N$奖励数量)>
+
+#OR
+EQUAL S$分割TEXT_1 平安铃铛
+EQUAL S$分割TEXT_1 66元充值券
+#ACT
+GuildNoticeMsg 250 11 恭喜玩家{[<$username>]|70:0:1}开启{圣诞礼物|70:0:1}获得稀有道具{[<$STR(S$分割TEXT_1)>*<$STR(N$奖励数量)>]|253:0:1}
+
+; 上报数据
+get_post_data S$上报数据 {"gevent":"使用圣诞礼物","gvalue":"1","desc":"<$STR(S$分割TEXT_1)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+
+BREAK
+
+
+
+[@StdModeFunc734]
+#IF
+NOT CHECKITEM 平安铃铛 1
+#ACT
+BREAK
+
+#IF
+#ACT
+MOV S$权重结果
+GETSTRVALUE T12 圣诞节玩具2022 N$圣诞节玩具2022
+MOV S$权重奖池 元宝+100000+200000#270|金刚石+50000+100000#270|技能包+1+4#80|项链保护卷+1+4#80|沉默水晶+1+4#80|仙灵珠+1+3#80|天赋神石+1+3#80|卧龙手书+1+2#50|黑铁矿+1+2#50
+
+#IF
+EQUAL N$圣诞节玩具2022 0
+#ACT
+INC S$权重奖池 |圣诞节限定玩具礼盒+1+2#1
+
+#IF
+SMALL G56 1
+RANDOMEX 2 100
+#ACT
+INC S$权重奖池 |黄金魔族指令书+1+2#1|紫金矿+1+2#1|卧龙秘宝+1+2#1|圣诞节限定玩具礼盒+1+2#1
+
+
+#IF
+#ACT
+RANSJSTR <$STR(S$权重奖池)> 1 3 S$权重结果 S$奖池剩余
+GETVALIDSTRSUPER <$STR(S$权重结果)> + S$分割TEXT_
+MOVR N$奖励数量 <$STR(S$分割TEXT_2)> <$STR(S$分割TEXT_3)>
+GIVE_EX <$STR(S$分割TEXT_1)> <$STR(N$奖励数量)>
+SENDMSG 9 打开平安铃铛获得[<$STR(S$分割TEXT_1)>*<$STR(N$奖励数量)>]
+
+
+; 记录上限
+#or
+EQUAL S$分割TEXT_1 紫金矿
+EQUAL S$分割TEXT_1 卧龙秘宝
+EQUAL S$分割TEXT_1 黄金魔族指令书
+#ACT
+INC G56 1
+GuildNoticeMsg 250 11 恭喜玩家{[<$username>]|70:0:1}开启{平安铃铛|70:0:1}获得稀有道具{[<$STR(S$分割TEXT_1)>*<$STR(N$奖励数量)>]|253:0:1}
+; 上报数据
+get_post_data S$上报数据 {"gevent":"使用平安铃铛","gvalue":"1","desc":"<$STR(S$分割TEXT_1)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+
+
+
+#IF
+EQUAL S$分割TEXT_1 圣诞节限定玩具礼盒
+#ACT
+ADDSTRVALUE T12 圣诞节玩具2022 1
+GuildNoticeMsg 250 11 恭喜玩家{[<$username>]|70:0:1}开启{平安铃铛|70:0:1}获得稀有道具{[<$STR(S$分割TEXT_1)>*<$STR(N$奖励数量)>]|253:0:1}
+; 上报数据
+get_post_data S$上报数据 {"gevent":"使用平安铃铛","gvalue":"1","desc":"<$STR(S$分割TEXT_1)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+
+
+
+
+[@StdModeFunc733]
+#IF
+NOT CHECKITEM 单身卡 1
+#ACT
+BREAK
+
+#IF
+#ACT
+addbuff 60009
+BREAK
+
+
+[@StdModeFunc732]
+#IF
+NOT CHECKITEM 卧龙秘宝 1
+#ACT
+BREAK
+
+#IF
+SMALL U91 10
+#ACT
+MOV S$卧龙秘宝抽奖 战神の帝#1|精灵の翔#10|守护の神#10|傀儡の隐#10|凤凰の飞#10|诅咒の亡#10
+#ELSEACT
+MOV S$卧龙秘宝抽奖 战神の帝#10|精灵の翔#10|守护の神#10|傀儡の隐#10|凤凰の飞#10|诅咒の亡#10
+
+#IF
+#ACT
+MOV S$卧龙秘宝WL
+RANSJSTR <$STR(S$卧龙秘宝抽奖)> 1 3 S$卧龙秘宝WL S$剩余道具
+
+#IF
+EQUAL S$卧龙秘宝WL
+#ACT
+STOP
+BREAK
+
+#IF
+#ACT
+INC U91 1
+SetThrowItemLy 5 卧龙山庄 卧龙秘宝 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$卧龙秘宝WL)> 1
+SENDMSG 9 获得秘宝[<$STR(S$卧龙秘宝WL)>]
+GuildNoticeMsg 251 11 恭喜玩家{[<$username>]|249:1:0}打开{[卧龙秘宝]|70:1:0}获得稀有的{[<$STR(S$卧龙秘宝WL)>]|253:1:0}
+
+#IF
+EQUAL S$卧龙秘宝WL 战神の帝
+#ACT
+MOV U91 0
+
+
+
+
+[@StdModeFunc731]
+#IF
+NOT CHECKITEM 万圣节限定玩具礼盒 1
+#ACT
+BREAK
+
+#IF
+#ACT
+SETTHROWITEMLY 5 万圣节限定 * <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE 绝版南瓜人 1
+SENDMSG 9 获得万圣节限定[绝版南瓜人]
+BREAK
+
+
+[@StdModeFunc745]
+#IF
+NOT CHECKITEM 圣诞节限定玩具礼盒 1
+#ACT
+BREAK
+
+#IF
+#ACT
+SetThrowItemLy 5 圣诞节限定 * <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE 绝版寒冰金刚 1
+SENDMSG 9 获得圣诞节限定[绝版寒冰金刚]
+BREAK
+
+
+[@StdModeFunc729]
+#IF
+NOT CHECKITEM 南瓜头 1
+#ACT
+BREAK
+
+
+#IF
+#ACT
+MOV S$南瓜头奖池 元宝+20000+30000#20|金刚石+10000+30000#20|修炼石+20+31#12|觉醒石+20+31#12|技能书页+1+6#11|活跃+1+6#7|豹胎易经丸+1+2#8|太妃糖+1+2#10|玩具礼盒+1+2#1
+RANSJSTR <$STR(S$南瓜头奖池)> 1 3 S$南瓜奖励 S$剩余道具
+GETVALIDSTRSUPER <$STR(S$南瓜奖励)> + S$南瓜奖励_
+GetDBItemFieldValue <$STR(S$南瓜奖励_1)> idx N$奖励IDX
+MOVR N$奖励数量 <$STR(S$南瓜奖励_2)> <$STR(S$南瓜奖励_3)>
+
+#IF
+SMALL N$奖励IDX 100
+#ACT
+money <$STR(S$南瓜奖励_1)> + <$STR(N$奖励数量)>
+SENDMSG 9 恭喜！获得南瓜头奖励[<$STR(S$南瓜奖励_1)>+<$STR(N$奖励数量)>]
+BREAK
+
+#IF
+EQUAL J3 0
+SMALL G37 5
+RANDOMEX 10 6000
+#ACT
+INC J3 1
+INC G37 1
+MOV N$奖励数量 1
+MOV S$南瓜奖励_1 66元充值券
+
+
+#IF
+#ACT
+GIVE <$STR(S$南瓜奖励_1)> <$STR(N$奖励数量)>
+SENDMSG 9 恭喜！获得南瓜头奖励[<$STR(S$南瓜奖励_1)>*<$STR(N$奖励数量)>]
+
+#or
+EQUAL <$STR(S$南瓜奖励_1)> 太妃糖
+EQUAL <$STR(S$南瓜奖励_1)> 66元充值券
+#ACT
+GuildNoticeMsg 151 11 恭喜玩家{[<$username>]|250:1:0}打开{万圣节南瓜头|70:1:0}成功获得稀有道具{[<$STR(S$南瓜奖励_1)>]|70:1:0}
+SENDMSGNEW 246 0 恭喜玩家<[<$username>]/FCOLOR=253>打开<万圣节南瓜头/FCOLOR=250>成功获得稀有道具<[<$STR(S$南瓜奖励_1)>]/FCOLOR=70> 1 3
+
+; 上报数据
+get_post_data S$上报数据 {"gevent":"使用南瓜头","gvalue":"1","desc":"<$STR(S$南瓜奖励_1)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+
+
+
+[@StdModeFunc730]
+#IF
+NOT CHECKITEM 太妃糖 1
+#ACT
+BREAK
+
+
+#IF
+SMALL G36 1
+RANDOMEX 10 300
+#ACT
+INC G36 1
+MOV S$太妃糖奖池 紫金矿+1+2#25|卧龙秘宝+1+2#25
+
+#ELSEACT
+MOV S$太妃糖奖池 元宝+200000+300000#20|金刚石+100000+200000#20|技能包+2+6#10|项链保护卷+2+6#7|沉默水晶+2+6#7|仙灵珠+2+6#12|天赋神石+2+6#10|玛法遗物+1+3#8|黑铁矿+1+2#5|白银矿+1+2#5
+
+#IF
+CHECK [10] 0
+#ACT
+INC S$太妃糖奖池 |万圣节限定玩具礼盒+1+2#1
+
+#IF
+#ACT
+RANSJSTR <$STR(S$太妃糖奖池)> 1 3 S$太妃糖抽奖 S$奖池剩余
+GETVALIDSTRSUPER <$STR(S$太妃糖抽奖)> + S$太妃糖抽奖_
+GetDBItemFieldValue <$STR(S$太妃糖抽奖_1)> idx N$奖励IDX
+MOVR N$奖励数量 <$STR(S$太妃糖抽奖_2)> <$STR(S$太妃糖抽奖_3)>
+
+#IF
+SMALL N$奖励IDX 100
+#ACT
+MONEY <$STR(S$太妃糖抽奖_1)> + <$STR(N$奖励数量)>
+SENDMSG 9 恭喜！获得太妃糖奖励[<$STR(S$太妃糖抽奖_1)>*<$STR(N$奖励数量)>]
+GuildNoticeMsg 250 11 恭喜{[<$username>]！|151:1:1}获得太妃糖奖励{[<$STR(S$太妃糖抽奖_1)>*<$STR(N$奖励数量)>]|70:1:1}
+BREAK
+
+#IF
+#ACT
+GIVE <$STR(S$太妃糖抽奖_1)> <$STR(N$奖励数量)>
+SENDMSG 9 恭喜！获得太妃糖奖励[<$STR(S$太妃糖抽奖_1)>*<$STR(N$奖励数量)>]
+GuildNoticeMsg 250 11 恭喜{[<$username>]！|151:1:1}获得太妃糖奖励{[<$STR(S$太妃糖抽奖_1)>*<$STR(N$奖励数量)>]|70:1:1}
+
+
+#IF
+EQUAL S$太妃糖抽奖_1 万圣节限定玩具礼盒
+#ACT
+SET [10] 1
+
+
+#or
+EQUAL S$太妃糖抽奖_1 紫金矿
+EQUAL S$太妃糖抽奖_1 卧龙秘宝
+EQUAL S$太妃糖抽奖_1 万圣节限定玩具礼盒
+#ACT
+SENDMSGNEW 246 0 恭喜玩家<[<$username>]/FCOLOR=253>打开<万圣节太妃糖/FCOLOR=250>成功获得稀有道具<[<$STR(S$太妃糖抽奖_1)>]/FCOLOR=70> 1 3
+
+; 上报数据
+get_post_data S$上报数据 {"gevent":"使用太妃糖","gvalue":"1","desc":"<$STR(S$太妃糖抽奖_1)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+
+
+
+
+[@StdModeFunc728]
+#IF
+CHECKITEM 国庆快乐 1
+#ACT
+addbuff 60006
+SENDMSG 9 成功获得[国庆快乐BUFF]，有效时间72小时
+BREAK
+
+[@StdModeFunc727]
+#IF
+NOT CHECKITEM 玩具礼盒 1
+#ACT
+BREAK
+
+#IF
+#ACT
+RANSJSTR 白野猪王#10|牛魔将军#10|祖玛大锤#10|虹魔教主#10|野蛮兽人#10|野蛮刀手#10|寒冰守卫#10|熊猫人#10 1 3 S$奖励道具LH S$剩余道具
+GIVE <$STR(S$奖励道具LH)> 1
+GuildNoticeMsg 250 11 玩家{[<$username>]|253:1:1}打开{玩具礼盒|251:1:1}获得道具{[<$STR(S$奖励道具LH)>]|249:1:1}
+BREAK
+
+[@StdModeFunc726]
+#IF
+NOT CHECKITEM 66元充值券 1
+#ACT
+BREAK
+
+#IF
+#ACT
+INC J0 66
+INC J9 66
+INC J69 66
+INC U30 66
+MONEY 充值 + 66
+MONEY 充值点 + 66
+MONEY 积分 + 660
+SENDMSG  9 成功获得66元真实充值
+BREAK
+
+
+; 国庆道具使用
+[@StdModeFunc722]
+#IF
+#ACT
+STOP
+MOV S$道具检测 普
+GOTO @国庆道具使用
+BREAK
+
+[@StdModeFunc723]
+#IF
+#ACT
+STOP
+MOV S$道具检测 天
+GOTO @国庆道具使用
+BREAK
+[@StdModeFunc724]
+#IF
+#ACT
+STOP
+MOV S$道具检测 同
+GOTO @国庆道具使用
+BREAK
+[@StdModeFunc725]
+#IF
+#ACT
+STOP
+MOV S$道具检测 庆
+GOTO @国庆道具使用
+BREAK
+
+
+[@国庆道具使用]
+#or
+SMALL <$UTCNOW8> $国庆结束
+NOT CHECKITEM <$STR(S$道具检测)> 1
+#ACT
+STOP
+BREAK
+
+#IF
+CHECKITEM <$STR(S$道具检测)> 10
+#ACT
+take <$STR(S$道具检测)> 10
+money 元宝 + 1000
+BREAK
+#ELSEACT
+take <$STR(S$道具检测)> 1
+money 元宝 + 100
+BREAK
+
+; 永恒塔的战利品
+[@StdModeFunc721]
+#IF
+NOT CHECKITEM 永恒塔的战利品 1
+#ACT
+BREAK
+#IF
+not CHECKBAGSIZE 10
+#ACT
+STOP
+SENDMSG 9 请预留足够的背包空间
+BREAK
+
+#IF
+random 2
+#ACT
+MOV S$道具奖池 *白虎图腾#10|*白虎图腾+1#5|*白虎图腾+2#2|*白虎图腾+3#1|
+INC S$道具奖池 *青龙图腾#10|*青龙图腾+1#5|*青龙图腾+2#2|*青龙图腾+3#1|
+INC S$道具奖池 *玄武图腾#10|*玄武图腾+1#5|*玄武图腾+2#2|*玄武图腾+3#1|
+INC S$道具奖池 *朱雀图腾#10|*朱雀图腾+1#5|*朱雀图腾+2#2|*朱雀图腾+3#1|
+INC S$道具奖池 *猩猩战甲#10|*猩猩战甲+1#10|*猩猩战甲+2#3|*猩猩战甲+3#2|*猩猩战甲+4#1|*猩猩战甲+5#1
+RANSJSTR <$STR(S$道具奖池)> 1 3 S$奖励道具ZLP S$剩余道具
+MOVR N$随机元宝 10 31
+MOVR N$随机金刚 5  16
+MUL N$随机元宝 10000
+MUL N$随机金刚 10000
+money 元宝 + <$STR(N$随机元宝)>
+money 金刚石 + <$STR(N$随机金刚)>
+SetThrowItemLy 5 永恒塔 永恒塔的战利品 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$奖励道具ZLP)> 1
+SENDMSG 9 打开战利品宝箱获得道具<font color="#f08a5d">[<$STR(S$奖励道具ZLP)>]</font>
+GuildNoticeMsg 250 11 恭喜{<$username>|151:1:0}玩家打开{永恒塔战利品宝箱|249:1:0}获得{[<$STR(S$奖励道具ZLP)>]|249:1:0}，和大量元宝金刚石。
+BREAK
+
+#IF
+#ACT
+MOVR N$随机元宝 10 31
+MOVR N$随机金刚 5  16
+MOVR N$随机水晶 1  11
+MUL N$随机元宝 10000
+MUL N$随机金刚 10000
+money 元宝 + <$STR(N$随机元宝)>
+money 金刚石 + <$STR(N$随机金刚)>
+SetThrowItemLy 5 永恒塔 永恒塔的战利品 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE 沉默水晶 <$STR(N$随机水晶)>
+SENDMSG 9 打开战利品宝箱获得道具<font color="#00adb5">[沉默水晶*<$STR(N$随机水晶)>个]</font>
+GuildNoticeMsg 250 11 恭喜{<$username>|151:1:0}玩家打开{永恒塔战利品宝箱|249:1:0}获得{[沉默水晶*<$STR(N$随机水晶)>个]|249:1:0}，和大量元宝金刚石。
+BREAK
+
+
+
+
+; 中秋福袋
+[@StdModeFunc719]
+#IF
+NOT CHECKITEM 中秋福袋 1
+#ACT
+BREAK
+
+#IF
+not CHECKBAGSIZE 10
+#ACT
+SENDMSG 9 请预留足够的背包空间
+BREAK
+
+#IF
+RANDOMEX 1 666
+LARGE G22 2000
+SMALL G22 99999999
+CHECKMONEY 荣誉值 > 20
+#ACT
+MOV G22 99999999
+INC J0 666
+INC J9 666
+INC J69 666
+INC U30 666
+MAILGIVE 元宝 6660000
+MAILGIVE 充值 666
+MAILGIVE 积分 6660
+SendMail 10 中秋福袋 中秋有豪礼\恭喜您开启了[中秋福袋]获得超级大奖[充值×666]
+SENDMSG 9 打开[中秋福袋]获得道具[充值×666]（本奖励请在邮件中领取）
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}从{中秋福袋|250:1:0}获得{[充值×666]|253:1:0}
+get_post_data S$上报数据 {"gevent":"中秋福袋","gvalue":"1","desc":"充值×666"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+BREAK
+
+#IF
+#ACT
+MOV S$福袋道具 元宝+50000#23|金刚石+20000#22|修炼石+50#10|觉醒石+50#10|技能书页+10#10|魔法娃娃+1#10|拜月秘典+1#10|赏月礼盒+1#5
+RANSJSTR <$STR(S$福袋道具)> 1 3 S$奖励道具ZQ S$剩余道具
+GETVALIDSTRSUPER <$STR(S$奖励道具ZQ)> + S$奖励道具_
+GetDBItemFieldValue <$STR(S$奖励道具_1)> IDX N$奖励道具IDX
+
+#or
+EQUAL S$奖励道具_1
+EQUAL S$奖励道具_2
+#ACT
+STOP
+SENDMSG 9 开启失败
+BREAK
+
+#IF
+SMALL N$奖励道具IDX 100
+#ACT
+INC G22 1
+money <$STR(S$奖励道具_1)> + <$STR(S$奖励道具_2)>
+SENDMSG 9 打开[中秋福袋]获得道具[<$STR(S$奖励道具_1)>*<$STR(S$奖励道具_2)>]
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}从{中秋福袋|250:1:0}获得{[<$STR(S$奖励道具_1)>*<$STR(S$奖励道具_2)>]|253:1:0}
+BREAK
+
+#IF
+#ACT
+INC G22 1
+SetThrowItemLy 5 <$map> 中秋福袋 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$奖励道具_1)> <$STR(S$奖励道具_2)>
+SENDMSG 9 打开[中秋福袋]获得道具[<$STR(S$奖励道具_1)>*<$STR(S$奖励道具_2)>]
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}从{中秋福袋|250:1:0}获得{[<$STR(S$奖励道具_1)>*<$STR(S$奖励道具_2)>]|253:1:0}
+get_post_data S$上报数据 {"gevent":"中秋福袋","gvalue":"1","desc":"赏月礼盒"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+
+; 赏月礼盒
+[@StdModeFunc720]
+#IF
+NOT CHECKITEM 赏月礼盒 1
+#ACT
+BREAK
+
+#IF
+SMALL <$UTCNOW8> 1662825600
+#ACT
+STOP
+SENDMSG 9 请在农历八月十六之后打开
+BREAK
+
+#IF
+not CHECKBAGSIZE 10
+#ACT
+SENDMSG 9 请预留足够的背包空间
+BREAK
+
+#IF
+RANDOMEX 1 250
+LARGE G23 250
+SMALL G23 99999999
+CHECKMONEY 荣誉值 > 20
+#ACT
+MOV G23 99999999
+MailGIVE 紫金矿 1 0#1#4#5
+SendMail 11 赏月礼盒 赏月有豪礼\恭喜您开启了[赏月礼盒]获得超级大奖[紫金矿*1]
+SENDMSG 9 打开[赏月礼盒]获得道具[紫金矿*1](次奖励请在邮件中领取)
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}从{赏月礼盒|250:1:0}获得{[紫金矿]|253:1:0}
+get_post_data S$上报数据 {"gevent":"赏月礼盒","gvalue":"1","desc":"紫金矿"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+#IF
+#ACT
+MOV S$礼盒道具 元宝+500000#23|金刚石+20000#22|黑铁矿+1+4#9|项链保护卷+1+4#8|沉默水晶+1+11#8|仙灵珠+1+11#7|天赋神石+1+6#7|玛法遗物+1+4#6|白银矿+1+2#5|黄金矿+1+2#5
+RANSJSTR <$STR(S$礼盒道具)> 1 3 S$奖励道具LH1 S$剩余道具
+GETVALIDSTRSUPER <$STR(S$奖励道具LH1)> + S$奖励道具_
+GetDBItemFieldValue <$STR(S$奖励道具_1)> IDX N$奖励道具IDX
+
+#or
+EQUAL S$奖励道具_1
+EQUAL S$奖励道具_2
+#ACT
+STOP
+SENDMSG 9 开启失败
+BREAK
+
+#IF
+SMALL N$奖励道具IDX 100
+#ACT
+INC G23 1
+money <$STR(S$奖励道具_1)> + <$STR(S$奖励道具_2)>
+SENDMSG 9 打开[赏月礼盒]获得道具[<$STR(S$奖励道具_1)>*<$STR(S$奖励道具_2)>]
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}从{赏月礼盒|250:1:0}获得{[<$STR(S$奖励道具_1)>*<$STR(S$奖励道具_2)>]|253:1:0}
+
+get_post_data S$上报数据 {"gevent":"赏月礼盒","gvalue":"1","desc":"<$STR(S$奖励道具_1)>*<$STR(S$奖励道具_2)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+
+BREAK
+
+#IF
+#ACT
+INC G23 1
+MOVR N$奖励数量 <$STR(S$奖励道具_2)> <$STR(S$奖励道具_3)>
+SetThrowItemLy 5 <$map> 赏月礼盒 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$奖励道具_1)> <$STR(N$奖励数量)>
+SENDMSG 9 打开[赏月礼盒]获得道具[<$STR(S$奖励道具_1)>*<$STR(N$奖励数量)>]
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}从{赏月礼盒|250:1:0}获得{[<$STR(S$奖励道具_1)>*<$STR(N$奖励数量)>]|253:1:0}
+
+get_post_data S$上报数据 {"gevent":"赏月礼盒","gvalue":"1","desc":"<$STR(S$奖励道具_1)>*<$STR(N$奖励数量)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/sale_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+[@StdModeFunc717]
+#IF
+NOT CHECKITEM 热血宝盒 1
+#ACT
+BREAK
+
+#IF
+#ACT
+MOV S$权重武器 海边月[神品]#40|海边月[圣品]#60|风云斩#70|风云斩[精品]#70|风云斩[极品]#100|风云斩[仙品]#40|风云斩[神品]#30|风云斩[圣品]#20|鬼斩#10
+INC S$权重武器 |铁骑战袍[神品]#40|铁骑战袍[圣品]#60|绝对防御#70|绝对防御[精品]#70|绝对防御[极品]#100|绝对防御[仙品]#40|绝对防御[神品]#30|绝对防御[圣品]#20|鬼甲#10
+RANSJSTR <$STR(S$权重武器)> 1 3 S$宝盒道具 S$剩余道具
+
+#IF
+EQUAL S$宝盒道具
+#ACT
+STOP
+SENDMSG 9 开启失败
+BREAK
+
+#IF
+#ACT
+SetThrowItemLy 5 <$map> 热血宝盒 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$宝盒道具)> 1
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}打开{热血宝盒|250:1:0}获得高级剑甲{[<$STR(S$宝盒道具)>]|253:1:0}
+BREAK
+
+
+[@StdModeFunc718]
+#IF
+NOT CHECKITEM 胜利宝盒 1
+#ACT
+BREAK
+
+#IF
+#ACT
+MOV S$权重武器 风云斩[仙品]#70|风云斩[神品]#100|风云斩[圣品]#40|鬼斩#30|鬼斩[精品]#20|鬼斩[极品]#10
+INC S$权重武器 |绝对防御[仙品]#70|绝对防御[神品]#100|绝对防御[圣品]#40|鬼甲#30|鬼甲[精品]#20|鬼甲[极品]#10
+RANSJSTR <$STR(S$权重武器)> 1 3 S$宝盒道具 S$剩余道具
+
+#IF
+EQUAL S$宝盒道具
+#ACT
+STOP
+SENDMSG 9 开启失败
+BREAK
+
+#IF
+#ACT
+SetThrowItemLy 5 <$map> 胜利宝盒 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$宝盒道具)> 1
+GuildNoticeMsg 251 11 玩家{[<$username>]|253:1:0}打开{胜利宝盒|250:1:0}获得高级剑甲{[<$STR(S$宝盒道具)>]|253:1:0}
+BREAK
+
+
+
+;----------------------------------------赞助----------------------------------------
+[@StdModeFunc714]
+#IF
+CHECKITEM 苹果 1
+#ACT
+addbuff 60001
+SENDMSG 6 食用苹果，获得血量上限5%，攻击伤害3%，持续300秒（下线计时）
+BREAK
+
+
+[@StdModeFunc803]
+#IF
+CHECKITEM 拜月秘典 1
+#ACT
+addbuff 60003
+SENDMSG 9 成功使用拜月秘典，爆率+30%，持续30分钟
+BREAK
+
+
+[@StdModeFunc713]
+#IF
+NOT CHECKITEM 豹胎易经丸 1
+#ACT
+BREAK
+
+#IF
+checkkuafu
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+#IF
+not SMALL U49 100
+#ACT
+GIVE 狂暴丹 1
+SENDMSG 9 不能在使用此道具，本次使用无效；已为您兑换未狂暴丹。
+BREAK
+
+#IF
+#ACT
+STOP
+SHOWPROGRESSBARDLG 5 @爆胎了 服用[苍月秘药]... 0 @exit
+BREAK
+
+[@爆胎了]
+#IF
+not SMALL U49 100
+#ACT
+SENDMSG 9 不能在使用此道具，本次使用无效。
+BREAK
+
+#IF
+NOT CHECKITEM 豹胎易经丸 1
+#ACT
+SENDMSG 9 终止执行
+BREAK
+#ELSEACT
+take 豹胎易经丸 1
+
+#IF
+random 5 100
+#ACT
+INC U49 1
+SENDMSG 9 成功使用[豹胎易经丸]获得角色爆率+1%
+#CALL [\04人物属性\爆率免伤.txt] @属性刷新EX
+BREAK
+#ELSEACT
+MOV N$爆胎爆胎 1
+kill 1
+SENDMSGNEW 146 0 玩家<[<$username>]/FCOLOR=250>服用苍月秘药<[豹胎易经丸]/FCOLOR=249>时暴毙，横尸荒野！不可谓不惨… 1 3
+BREAK
+
+
+[@STDMODEFUNC710]
+#IF
+NOT CHECKITEM 魔法娃娃 1
+#ACT
+BREAK
+
+#IF
+CHECKKUAFU
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+#IF
+#ACT
+STOP
+SHOWPROGRESSBARDLG 2 @吟唱完毕打开娃娃 正在[吟唱魔法]... 0 @吟唱终止
+BREAK
+
+[@吟唱终止]
+#IF
+#ACT
+SENDMSG 9 吟唱魔法被终止……
+BREAK
+
+[@吟唱完毕打开娃娃]
+#CALL [\悬浮按钮\魔法娃娃.txt] @魔法娃娃
+
+[@StdModeFunc712]
+#IF
+NOT CHECKITEM 二十四桥明月夜 1
+#ACT
+BREAK
+
+#IF
+CHECKKUAFU
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+
+#IF
+NOT HAVEGUILD
+#ACT
+STOP
+SENDMSG 9 没有行会，无法使用此道具。
+BREAK
+
+#IF
+#ACT
+GOTOLABELEX 1 @二十四桥明月夜行会触发
+BREAK
+
+[@二十四桥明月夜行会触发]
+#IF
+HAVEGUILD
+#ACT
+ADDBUFF 60002
+PLAYEFFECT 4 0 0 3 0
+SENDMSG 9 获得[二十四桥明月夜]BUFF，生命值提升10%，30分钟内有效。
+SENDMSG 6 获得[二十四桥明月夜]BUFF，生命值提升10%，30分钟内有效。
+BREAK
+
+
+[@StdModeFunc711]
+#IF
+check [2] 1
+#ACT
+STOP
+SENDMSG 9 当前已有狂暴，无法开启
+BREAK
+
+#IF
+CHECKITEM 狂暴丹 1
+#ACT
+SETNPCMSG 使用狂暴丹
+Set [2] 1
+CONFERTITLE 超级狂暴
+HUMANhp = <$maxhp>
+HUMANmp = <$maxmp>
+SENDMSG 9 恭喜您，使用[狂暴丹]开启超级狂暴！
+#Call [\04人物属性\人物倍攻.txt] @人物倍攻
+#Call [\04人物属性\称号刷新.txt] @刷新称号
+SENDMOVEMSG 0 250 0 80 1 恭喜玩家：【<<$UserName>/FCOLOR=251>】成功开启超级狂暴，击杀他可获得：<20000元宝/FCOLOR=249>！！！
+SENDMSG 0 恭喜玩家：{【<$UserName>】|250:0:1}使用【狂暴丹】开启超级狂暴，击杀他可获得{20000元宝|250:0:1}
+BREAK
+
+
+[@StdModeFunc815]
+#IF
+RANDOMEX 60 100
+#ACT
+MOV S$抽取货币 元宝
+#ELSEACT
+MOV S$抽取货币 金刚石
+
+#IF
+CHECKITEM 魔法糖果 1
+#ACT
+MOVR N$随机数值 1 100
+MUL N$随机数值 100
+money <$STR(S$抽取货币)> + <$STR(N$随机数值)>
+SENDMSG 6 使用道具，增加<$STR(S$抽取货币)>×<$STR(N$随机数值)>个
+BREAK
+
+
+
+
+;BOSS召唤卷（福利）
+[@StdModeFunc700] 
+#IF
+CHECKKUAFU
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+
+#OR
+INSAFEZONE
+ISONMAP rxsc807
+ISONMAP rxsc042
+#ACT
+STOP
+SENDMSG 9 当前区域无法使用此道具
+BREAK
+
+#IF
+CHECKITEM BOSS召唤卷（福利） 1
+#ACT
+INC U87 1
+MonGenEx <$map> <$x> <$y> 送宝白野猪 2 1 0 116
+SENDMSG 9 召唤成功。
+SENDMSG 0 玩家<$username>在地图<$maptitle>成功召唤出BOSS【送宝白野猪】。
+
+get_post_data S$上报数据 {"itemname":"BOSS召唤卷（福利）","itemidx":"<$CURREATEITEM>","usecount":"1","desc":"送宝白野猪"}
+HTTPPOST http://211.149.241.27:4473/api/api996/use_log 0 <$STR(S$上报数据)>
+
+; 修复BUG
+#IF
+LARGE U87 1
+#ACT
+take BOSS召唤卷（福利） 9999
+
+
+ ;剑甲礼盒（60阶）
+[@StdModeFunc701]
+#IF
+checkkuafu
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+#IF
+CHECKITEM 剑甲礼盒（60阶） 1
+#ACT
+SetThrowItemLy 5 <$MAP> 目标奖励 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE 屠龙[圣品] 1
+SetThrowItemLy 5 <$MAP> 目标奖励 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE 雷霆盔甲[圣品] 1
+SENDMSG 9 获得60阶剑甲。
+BREAK
+
+ ;首饰礼盒（90阶）
+[@StdModeFunc702]
+#IF
+NOT CHECKITEM 首饰礼盒（90阶） 1
+NOT CHECKITEM 青铜挑战者勋章 1
+#ACT
+BREAK
+
+#IF
+CHECKKUAFU
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+
+#IF
+#ACT
+MOV S$获得首饰
+MOV S$道具来源 目标奖励
+RANSJSTR 梦幻头盔[圣品]#100|梦幻项链[圣品]#100|梦幻手镯[圣品]#100|梦幻戒指[圣品]#100|梦幻腰带[圣品]#100|梦幻鞋子[圣品]#100 0 0 S$获得首饰 S$剩余首饰
+GetValidstr <$STR(S$获得首饰)> # S$获得首饰 N$权重
+#IF
+EQUAL S$获得首饰
+#ACT
+STOP
+SENDMSG 9 获得失败。
+BREAK
+
+#IF
+LARGE <$CURREATEITEM> 15000
+#ACT
+MOV S$道具来源 挑战者勋章
+
+#IF
+#ACT
+SetThrowItemLy 5 <$MAP> 目标奖励 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$获得首饰)> 1
+SENDMSG 9 获得90阶首饰[<$STR(S$获得首饰)>]。
+BREAK
+
+;首饰礼盒（98阶）
+[@StdModeFunc703]
+#IF
+NOT CHECKITEM 首饰礼盒（98阶） 1
+NOT CHECKITEM 白银挑战者勋章 1
+#ACT
+BREAK
+#IF
+CHECKKUAFU
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+#IF
+#ACT
+MOV S$获得首饰
+MOV S$道具来源 目标奖励
+RANSJSTR 静寂战盔[精品]#100|静寂战链[精品]#100|静寂战镯[精品]#100|静寂战戒[精品]#100|静寂战带[精品]#100|静寂战靴[精品]#100 0 0 S$获得首饰 S$剩余首饰
+GetValidstr <$STR(S$获得首饰)> # S$获得首饰 N$权重
+#IF
+EQUAL S$获得首饰
+#ACT
+STOP
+SENDMSG 9 获得失败。
+BREAK
+#IF
+LARGE <$CURREATEITEM> 15000
+#ACT
+MOV S$道具来源 挑战者勋章
+
+#IF
+#ACT
+SetThrowItemLy 5 <$MAP> 目标奖励 <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$获得首饰)> 1
+SENDMSG 9 获得98阶首饰[<$STR(S$获得首饰)>]。
+BREAK
+
+;首饰礼盒（105阶）
+[@StdModeFunc704]
+#IF
+NOT CHECKITEM 首饰礼盒（105阶） 1
+NOT CHECKITEM 黄金挑战者勋章 1
+#ACT
+BREAK
+
+#IF
+CHECKKUAFU
+#ACT
+STOP
+SENDMSG 9 此区域无法使用
+BREAK
+
+#IF
+#ACT
+MOV S$获得首饰
+MOV S$道具来源 目标奖励
+RANSJSTR 金域头盔[极品]#100|金域令[极品]#100|金域手镯[极品]#100|金域戒指[极品]#100|金域腰带[极品]#100|金域鞋子[极品]#100 0 0 S$获得首饰 S$剩余首饰
+GetValidstr <$STR(S$获得首饰)> # S$获得首饰 N$权重
+#IF
+EQUAL S$获得首饰
+#ACT
+STOP
+SENDMSG 9 获得失败。
+BREAK
+
+#IF
+LARGE <$CURREATEITEM> 15000
+#ACT
+MOV S$道具来源 挑战者勋章
+
+#IF
+#ACT
+SetThrowItemLy 5 <$MAP> <$STR(S$道具来源)> <$USERNAME> <$YEAR>-<$MONTH>-<$DAY> <$HOUR>:<$MINUTE>:<$SECOND>
+GIVE <$STR(S$获得首饰)> 1
+SENDMSG 9 获得105阶首饰[<$STR(S$获得首饰)>]。
+BREAK
+
+[@时装材料解开包]
+#IF
+NOT EQUAL S$解包名称
+#ACT
+GIVE <$STR(S$解包名称)> 1
+SENDMSG 6 获得1个[<$STR(S$解包名称)>]
+MOV S$解包名称
+BREAK
+
+
+[@StdModeFunc900]
+#IF
+NOT CHECKITEM *猩猩战甲 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+
+[@StdModeFunc901]
+#IF
+NOT CHECKITEM *猩猩战甲+1 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+1
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc902]
+#IF
+NOT CHECKITEM *猩猩战甲+2 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+2
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc903]
+#IF
+NOT CHECKITEM *猩猩战甲+3 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+3
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc904]
+#IF
+NOT CHECKITEM *猩猩战甲+4 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+4
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc905]
+#IF
+NOT CHECKITEM *猩猩战甲+5 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+5
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc906]
+#IF
+NOT CHECKITEM *猩猩战甲+6 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+6
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc907]
+#IF
+NOT CHECKITEM *猩猩战甲+7 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+7
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc908]
+#IF
+NOT CHECKITEM *猩猩战甲+8 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+8
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc909]
+#IF
+NOT CHECKITEM *猩猩战甲+9 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 猩猩战甲+9
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc911]
+#IF
+NOT CHECKITEM *麒麟战甲+1 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+1
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc912]
+#IF
+NOT CHECKITEM *麒麟战甲+2 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+2
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc913]
+#IF
+NOT CHECKITEM *麒麟战甲+3 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+3
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc914]
+#IF
+NOT CHECKITEM *麒麟战甲+4 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+4
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc915]
+#IF
+NOT CHECKITEM *麒麟战甲+5 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+5
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc916]
+#IF
+NOT CHECKITEM *麒麟战甲+6 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+6
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc917]
+#IF
+NOT CHECKITEM *麒麟战甲+7 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+7
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc918]
+#IF
+NOT CHECKITEM *麒麟战甲+8 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+8
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc919]
+#IF
+NOT CHECKITEM *麒麟战甲+9 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 麒麟战甲+9
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc920]
+#IF
+NOT CHECKITEM *青龙图腾 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc921]
+#IF
+NOT CHECKITEM *青龙图腾+1 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+1
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc922]
+#IF
+NOT CHECKITEM *青龙图腾+2 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+2
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc923]
+#IF
+NOT CHECKITEM *青龙图腾+3 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+3
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc924]
+#IF
+NOT CHECKITEM *青龙图腾+4 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+4
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc925]
+#IF
+NOT CHECKITEM *青龙图腾+5 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+5
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc926]
+#IF
+NOT CHECKITEM *青龙图腾+6 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+6
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc927]
+#IF
+NOT CHECKITEM *青龙图腾+7 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+7
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc928]
+#IF
+NOT CHECKITEM *青龙图腾+8 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+8
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc929]
+#IF
+NOT CHECKITEM *青龙图腾+9 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 青龙图腾+9
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc930]
+#IF
+NOT CHECKITEM *白虎图腾 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+
+[@StdModeFunc931]
+#IF
+NOT CHECKITEM *白虎图腾+1 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+1
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc932]
+#IF
+NOT CHECKITEM *白虎图腾+2 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+2
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc933]
+#IF
+NOT CHECKITEM *白虎图腾+3 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+3
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc934]
+#IF
+NOT CHECKITEM *白虎图腾+4 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+4
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc935]
+#IF
+NOT CHECKITEM *白虎图腾+5 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+5
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc936]
+#IF
+NOT CHECKITEM *白虎图腾+6 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+6
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc937]
+#IF
+NOT CHECKITEM *白虎图腾+7 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+7
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc938]
+#IF
+NOT CHECKITEM *白虎图腾+8 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+8
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc939]
+#IF
+NOT CHECKITEM *白虎图腾+9 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 白虎图腾+9
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc940]
+#IF
+NOT CHECKITEM *玄武图腾 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc941]
+#IF
+NOT CHECKITEM *玄武图腾+1 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+1
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc942]
+#IF
+NOT CHECKITEM *玄武图腾+2 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+2
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc943]
+#IF
+NOT CHECKITEM *玄武图腾+3 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+3
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc944]
+#IF
+NOT CHECKITEM *玄武图腾+4 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+4
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc945]
+#IF
+NOT CHECKITEM *玄武图腾+5 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+5
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc946]
+#IF
+NOT CHECKITEM *玄武图腾+6 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+6
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc947]
+#IF
+NOT CHECKITEM *玄武图腾+7 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+7
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc948]
+#IF
+NOT CHECKITEM *玄武图腾+8 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+8
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc949]
+#IF
+NOT CHECKITEM *玄武图腾+9 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 玄武图腾+9
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc950]
+#IF
+NOT CHECKITEM *朱雀图腾 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc951]
+#IF
+NOT CHECKITEM *朱雀图腾+1 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+1
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc952]
+#IF
+NOT CHECKITEM *朱雀图腾+2 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+2
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc953]
+#IF
+NOT CHECKITEM *朱雀图腾+3 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+3
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc954]
+#IF
+NOT CHECKITEM *朱雀图腾+4 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+4
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc955]
+#IF
+NOT CHECKITEM *朱雀图腾+5 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+5
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc956]
+#IF
+NOT CHECKITEM *朱雀图腾+6 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+6
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc957]
+#IF
+NOT CHECKITEM *朱雀图腾+7 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+7
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc958]
+#IF
+NOT CHECKITEM *朱雀图腾+8 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+8
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+[@StdModeFunc959]
+#IF
+NOT CHECKITEM *朱雀图腾+9 1
+#ACT
+BREAK
+#IF
+CHECKBAGSIZE 5
+#ACT
+MOV S$解包名称 朱雀图腾+9
+GOTO @时装材料解开包
+#ELSEACT
+STOP
+SENDMSG 9 请预留足够的背包空间。
+BREAK
+
+[@主界面按钮设置]
+#Call [\主界面基础按钮\主界面基础按钮QF.txt] @基础按钮QF
+
+
+[@UpdateGuildNotice]
+#IF
+LARGE U3 5
+#ACT
+SENDMSG 9 你编辑了行会公告
+#ELSEACT
+STOP
+MESSAGEBOX 系统：编辑公共需要领取第六档礼包!
+
+; 进背包触发
+[@AddBag]
+#CALL [\03自定义按钮\自动使用.TXT] @自动使用
+
+#IF
+CHECK [40] 1
+NOT CHECKBAGSIZE 16
+#ACT
+#CALL [\03自定义按钮\装备自动回收.txt] @装备自动回收
+
+[@DeleteTask]
+#IF
+EQUAL U50 99
+EQUAL <$GAMEID> 6015
+#ACT
+NEWPICKTASK 23
+
+;-========点击任务点击
+[@ClickNewTask]
+#CALL [\登录触发\任务触发.txt] @任务点击
+
+;-----------------任务刷新 刷新任务触发
+[@ChangeTask]
+#IF
+EQUAL U50 1
+LARGE U51 9
+#ACT
+MOV U50 2
+OPENNPCSHOWEX 15 5 5
+BREAK
+
+#IF
+EQUAL U50 3
+CHECKMONEY 神力值 ? 10
+#ACT
+OPENNPCSHOWEX 15 1 1
+BREAK
+
+#IF
+LARGE U2 9
+EQUAL U50 7
+#ACT
+MOV U50 15
+NEWPICKTASK 15
+NEWDELETETASK 7
+
+
+
+
+
+[@MagTagFunc44]
+#IF
+RANDOMEX 10 100
+#ACT
+<$CURRRTARGETNAME>.MAKEPOSION 12 3
+
+
+[@开始提升神石]
+#IF
+#ACT
+ReadCacheConfigFileItem ..\QuestDiary\01配置项\神石配置项.ini 神石配置 <$STR(U2)> N$神石需求
+
+#or
+isonmap rydt
+CheckMoney 神力值 < <$STR(N$神石需求)>
+#ACT
+DelbutShow 1
+SENDMSG 9 当前状态无法传送！
+BREAK
+
+#or
+insafezone 
+isonmap Rxsc042
+#ACT
+GOTO @真开始提升神石
+BREAK
+
+#IF
+#ACT
+STOPAutoPlayGame
+SHOWPROGRESSBARDLG 2 @真开始提升神石 准备传送，进度%d%.. 1 @exit
+BREAK
+
+[@真开始提升神石]
+#IF
+#ACT
+DelbutShow 1
+OPENNPCSHOWEX 15 3 2
+
+; 属性变化刷新战力
+[@SendAbility]
+; 刷新战力，20秒
+#IF
+SMALL U64 <$UTCNOW8>
+#ACT
+FORMULATION <$UTCNOW8>+20 U64
+#CALL [\03自定义按钮\战斗力计算.txt] @战力计算
+
+
+
+; 地图BOSS刷新提示
+[@刷怪通知]
+#IF
+NOT EQUAL <$HOUR> 21
+NOT CHECKUNDERWAR 沙巴克
+#ACT
+SENDMOVEMSG 0 253 0 268 1 <[<$GENMONMAP>]/FCOLOR=151>地图已刷新<[<$GENMONNAME>]/FCOLOR=250><$cfg_怪物刷新通知(<$GetTypeBRow(cfg_怪物刷新通知,0,<$GENMONNAME>)>_1)>
+; SENDMOVEMSG 0 253 0 268 1 <[<$GENMONMAP>]/FCOLOR=151>地图已刷新<[<$GENMONNAME>]/FCOLOR=250>
+
+
+
+[@复活计时结束]
+#IF
+#ACT
+; MOV U71 0
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+[@蛛网计时结束]
+#IF
+#ACT
+; MOV U72 0
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+[@禁锢计时结束]
+#IF
+#ACT
+; MOV U73 0
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+[@电击计时结束]
+#IF
+#ACT
+; MOV U74 0
+#CALL [04人物属性\刷新神器等级.txt] @BUFF状态ICON
+BREAK
+
+
+[@地图时间截止回城]
+#OR
+ISONMAP fmmj
+ISONMAP brmmj
+ISONMAP brmmj2
+LARGE <$GetTypeBRow(cfg_苍月地图免伤,1,<$map>)> 0
+#ACT
+MAPMOVE Rxsc042 331 331 5
+SendMail 12 地图时间截止提示 尊敬的玩家\您所在的地图已达到最大进入时间，现已将您安全回城！
+BREAK
+
+
+
+[@卧龙秘境传播瘟疫]
+#IF
+; RANDOM 2
+ISONMAP wlyj
+NOT EQUAL A70 <$USERNAME>
+#ACT
+ADDBUFF 90000 10
+SENDMSG 9 你已感染瘟疫，附加2%最大生命伤害，持续10秒
+
+[@瘟疫触发检测]
+#IF
+ISONMAP wlyj
+#ACT
+MOV G70 <$X>
+MOV G71 <$Y>
+MOV A70 <$USERNAME>
+GOTOLABELEX 2 @传染瘟疫检测
+
+[@传染瘟疫检测]
+#IF
+NOT EQUAL <$USERNAME> <$STR(A70)>
+CheckHumInRange wlyj <$STR(G70)> <$STR(G71)> 3
+#ACT
+ADDBUFF 90000 10
+SENDMSG 9 你被玩家[<$STR(A70)>]感染瘟疫，附加2%最大生命伤害，持续10秒
+
+
+[@延迟开始挂机]
+#IF
+CHECKLEVELEX ? 40
+#ACT
+MOV N$PK 0
+STARTAUTOPLAYGAME
+BREAK
+
+
+[@高级掉落检测20]
+#IF
+NOT SMALL G0 20
+#ACT
+ALLOWDROP 1
+#ELSEACT
+ALLOWDROP 0
+
+[@高级掉落检测45]
+#IF
+NOT SMALL G0 45
+#ACT
+ALLOWDROP 1
+#ELSEACT
+ALLOWDROP 0
+
+
+; 跨服系列触发
+
+; 跨服结束 本服触发
+[@KUAFUEND]
+#IF
+#ACT
+SENDMSG 9 [退出跨服]服务器
+SetOnTimer 2 2 0 1
+; 跨服定时器
+VAR Integer HUMAN 战斗力
+VAR Integer HUMAN 等级数
+VAR Integer HUMAN 爆率数
+VAR Integer HUMAN 刀魂数
+VAR Integer HUMAN 杀怪数
+VAR Integer HUMAN 个人捐献
+#Call [\04人物属性\人物倍攻.txt] @人物倍攻
+#Call [\04人物属性\称号刷新.txt] @刷新称号
+#CALL [\登录触发\任务触发.txt] @任务领取
+#CALL [\04人物属性\刷新神器等级.txt] @神器等级刷新
+#CALL [\04人物属性\爆率免伤.txt] @属性刷新EX
+#Call [\悬浮按钮\悬浮按钮展开.txt] @悬浮按钮展开
+#Call [\主界面基础按钮\主界面基础按钮QM.txt] @基础按钮QM
+#Call [\03自定义按钮\战斗力计算.txt] @战力计算
+
+
+; 进入跨服  跨服触发
+[@KFLOGIN]
+#IF
+#ACT
+SETONTIMER 4 1 0 1
+PICKUPITEMS 0 10 500
+#Call [\04人物属性\人物倍攻.txt] @人物倍攻
+#Call [\04人物属性\称号刷新.txt] @刷新称号
+#CALL [\登录触发\任务触发.txt] @任务领取
+#CALL [\04人物属性\刷新神器等级.txt] @神器等级刷新
+#CALL [\04人物属性\爆率免伤.txt] @属性刷新EX
+#Call [\悬浮按钮\悬浮按钮跨服.txt] @跨服按钮展开
+#Call [\03自定义按钮\战斗力计算.txt] @战力计算
+SENDMSG 9 [进入跨服]服务器
+
+
+; 跨服刷怪
+#IF
+NOT EQUAL G13 <$YEAR><$MONTH><$DAY>
+#ACT
+CLEARMAPMON kuafu02
+MOV G13 <$YEAR><$MONTH><$DAY>
+MonGenEx kuafu02 146 138  世界之最·叱咤神魔   1 1 0 116 世界之最·叱咤神魔\[跨服] 0
+MonGenEx kuafu02 244 91   世界之最·大鼋★★★ 1 1 0 116 世界之最·大鼋★★★\[跨服] 0
+MonGenEx kuafu02 108 247  世界之最·魔刀霸王   1 1 0 116 世界之最·魔刀霸王\[跨服] 0
+MonGenEx kuafu02 218 206  世界之最·太极玄天   1 1 0 116 世界之最·太极玄天\[跨服] 0
+MonGenEx kuafu02 80  367  世界之最·大梵般若   1 1 0 116 世界之最·大梵般若\[跨服] 0
+MonGenEx kuafu02 236 297  世界之最·大道妖尊   1 1 0 116 世界之最·大道妖尊\[跨服] 0
+MonGenEx kuafu02 167 424  世界之最·天地之主   1 1 0 116 世界之最·天地之主\[跨服] 0
+MonGenEx kuafu02 293 389  世界之最·万兽之王   1 1 0 116 世界之最·万兽之王\[跨服] 0
+MonGenEx kuafu02 202 544  世界之最·人皇始祖   1 1 0 116 世界之最·人皇始祖\[跨服] 0
+MonGenEx kuafu02 300 534  世界之最·太玄圣虎   1 1 0 116 世界之最·太玄圣虎\[跨服] 0
+MonGenEx kuafu02 318 242  世界之最·深海巨兽   1 1 0 116 世界之最·深海巨兽\[跨服] 0
+MonGenEx kuafu02 401 122  世界之最·熔岩恶魔   1 1 0 116 世界之最·熔岩恶魔\[跨服] 0
+MonGenEx kuafu02 414 194  世界之最·冰天猿魔   1 1 0 116 世界之最·冰天猿魔\[跨服] 0
+MonGenEx kuafu02 438 264  世界之最·碧睛狂狮   1 1 0 116 世界之最·碧睛狂狮\[跨服] 0
+MonGenEx kuafu02 479 346  世界之最·魔獠暴猪   1 1 0 116 世界之最·魔獠暴猪\[跨服] 0
+MonGenEx kuafu02 453 439  世界之最·洪荒猛犸   1 1 0 116 世界之最·洪荒猛犸\[跨服] 0
+MonGenEx kuafu02 452 554  世界之最·魑魅魍魉   1 1 0 116 世界之最·魑魅魍魉\[跨服] 0
+MonGenEx kuafu02 556 244  世界之最·离火麒麟   1 1 0 116 世界之最·离火麒麟\[跨服] 0
+MonGenEx kuafu02 546 100  世界之最·荒漠屠夫   1 1 0 116 世界之最·荒漠屠夫\[跨服] 0
+MonGenEx kuafu02 422 43   世界之最·黑石离龟   1 1 0 116 世界之最·黑石离龟\[跨服] 0
+MonGenEx kuafu02 300 300  跨服·勇士 300 2000 0 251 跨服·勇士 0
+; 乱斗BOSS
+MonGenEx kuafu03 47 40  发财树 1 1 0 249 跨服·发财树 0
+
+
+; 这段只是引入到跨服脚本中，不会直接触发
+; 所有跨服要用的触发 都一起调用了
+#IF
+CHECKLEVELEX ? 999999
+#ACT
+#CALL [\悬浮按钮\铁匠功能2.txt] @拾取鉴定EX
+
+
+
+; 同步跨服变量触发,X为回调ID(参照跨服系统说明)
+[@kfsynvarX]
+
+
+[@传送跨服乱斗门口]
+#IF
+#ACT
+MAPMOVE kuafu02 294 63 3
+BREAK

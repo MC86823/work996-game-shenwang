@@ -1,0 +1,1363 @@
+#INCLUDE 版本常量.ini
+[@startup]
+#IF
+#ACT
+; 苍月岛开放标识
+MOV G2 1
+; 初始化苍月传送计时
+MOV G12 0
+MOV G11 5400
+; 风雷召唤令记录信息变量，重启清空一下
+MOV A17
+#CALL [\CSV\加载CSV配置文件到内存.txt] @加载CSV配置
+; 加载内存文件(数据文件 脚本不用放这里)
+LoadFileToMemory ..\QuestDiary\05数据文件\夺宝记录.txt 1
+LoadFileToMemory ..\QuestDiary\01配置项\03高级跑酷抽取.txt 1
+LoadFileToMemory ..\QuestDiary\01配置项\02中级跑酷抽取.txt 1
+LoadFileToMemory ..\QuestDiary\01配置项\01低级跑酷抽取.txt 1
+LoadFileToMemory ..\QuestDiary\05数据文件\回城石显示文字.txt 1
+
+; 启动时排序，放入缓存（鬼知道有用没用）
+SortHumVar 战斗力 S$战力第 N$战力数 0 1 100
+SortHumVar 等级数 S$等级第 N$等级数 0 1 100
+SortHumVar 爆率数 S$爆率第 N$爆率数 0 1 100
+SortHumVar 刀魂数 S$刀魂第 N$刀魂数 0 1 100
+
+; 装载首爆数据到引擎
+#IF
+EQUAL A16 
+#ACT
+CLEARNAMELIST ..\QuestDiary\05数据文件\夺宝记录.txt
+MOV N1 0
+WHILE N1 < <$Getcsv(cfg_首爆奖励配置,Row)>
+ADDSTRVALUE A13 <$cfg_首爆奖励配置(<$STR(N1)>_0)> <$cfg_首爆奖励配置(<$STR(N1)>_2)>
+ADDSTRVALUE A14 <$cfg_首爆奖励配置(<$STR(N1)>_0)> <$cfg_首爆奖励配置(<$STR(N1)>_3)>
+ADDSTRVALUE A15 <$cfg_首爆奖励配置(<$STR(N1)>_0)> <$cfg_首爆奖励配置(<$STR(N1)>_4)>
+ADDSTRVALUE A16 <$cfg_首爆奖励配置(<$STR(N1)>_0)> <$cfg_首爆奖励配置(<$STR(N1)>_1)>
+INC N1 1
+ENDWHILE
+
+; 判断合服增加合服活动按钮
+#IF
+NOT EQUAL <$HFCOUNT> <$STR(G65)>
+#ACT
+MOV G65 <$HFCOUNT>
+FORMULATION <$UTCNOW8>+172800 A65
+
+
+; 增加内部测试区默认密码
+#IF
+EQUAL A26
+#ACT
+MOV A26 46432287
+
+
+#IF
+SMALL G387 30
+#ACT
+CLEARNAMELIST ..\QuestDiary\05数据文件\夺宝记录.txt
+
+; 初始化周奖励开始时间
+#IF
+EQUAL G58 0
+#ACT
+MOV G58 <$YEAR><$MONTH><$DAY>
+
+;地图特效
+#IF
+#Act
+MAPEFFECT 1 cymg1 33 14 55002 0 0
+MAPEFFECT 1 cymg1 16 14 55002 0 0
+MAPEFFECT 1 cymg1 9  31 55002 0 0
+MAPEFFECT 1 cymg1 33 39 55002 0 0
+MAPEFFECT 1 cymg2 33 14 55002 0 0
+MAPEFFECT 1 cymg2 16 14 55002 0 0 
+MAPEFFECT 1 cymg2 9  31 55002 0 0
+MAPEFFECT 1 cymg2 33 39 55002 0 0 
+MAPEFFECT 1 cymg3 33 14 55002 0 0
+MAPEFFECT 1 cymg3 16 14 55002 0 0 
+MAPEFFECT 1 cymg3 9  31 55002 0 0
+MAPEFFECT 1 cymg3 33 39 55002 0 0 
+MAPEFFECT 1 cymg4 33 14 55002 0 0
+MAPEFFECT 1 cymg4 16 14 55002 0 0 
+MAPEFFECT 1 cymg4 9  31 55002 0 0
+MAPEFFECT 1 cymg4 33 39 55002 0 0 
+MAPEFFECT 1 cymg5 33 14 55002 0 0
+MAPEFFECT 1 cymg5 16 14 55002 0 0 
+MAPEFFECT 1 cymg5 9  31 55002 0 0
+MAPEFFECT 1 cymg5 33 39 55002 0 0 
+MAPEFFECT 1 cymg6 33 14 55002 0 0
+MAPEFFECT 1 cymg6 16 14 55002 0 0 
+MAPEFFECT 1 cymg6 9  31 55002 0 0
+MAPEFFECT 1 cymg6 33 39 55002 0 0 
+MAPEFFECT 1 cymg7 33 14 55002 0 0
+MAPEFFECT 1 cymg7 16 14 55002 0 0 
+MAPEFFECT 1 cymg7 9  31 55002 0 0
+MAPEFFECT 1 cymg7 33 39 55002 0 0 
+MAPEFFECT 1 cymg8 33 14 55002 0 0
+MAPEFFECT 1 cymg8 16 14 55002 0 0 
+MAPEFFECT 1 cymg8 9  31 55002 0 0
+MAPEFFECT 1 cymg8 33 39 55002 0 0 
+MAPEFFECT 1 haidi2 182 155 55002 0 0 
+MAPEFFECT 1 haidi3 281 19  55002 0 0 
+MAPEFFECT 1 haidi4 174 90  55002 0 0 
+;生死门
+MAPEFFECT 1 ssm1 18 32 55002 0 0 
+MAPEFFECT 1 ssm1 27 33 55002 0 0 
+MAPEFFECT 1 ssm1 22 28 55002 0 0 
+MAPEFFECT 1 ssm1 16 23 55002 0 0 
+MAPEFFECT 1 ssm1 32 26 55002 0 0 
+MAPEFFECT 1 ssm1 27 21 55002 0 0 
+MAPEFFECT 1 ssm1 22 17 55002 0 0 
+MAPEFFECT 1 ssm1 32 17 55002 0 0 
+MAPEFFECT 1 ssm2 18 32 55002 0 0 
+MAPEFFECT 1 ssm2 27 33 55002 0 0 
+MAPEFFECT 1 ssm2 22 28 55002 0 0 
+MAPEFFECT 1 ssm2 16 23 55002 0 0 
+MAPEFFECT 1 ssm2 32 26 55002 0 0 
+MAPEFFECT 1 ssm2 27 21 55002 0 0 
+MAPEFFECT 1 ssm2 22 17 55002 0 0 
+MAPEFFECT 1 ssm2 32 17 55002 0 0 
+MAPEFFECT 1 ssm3 18 32 55002 0 0 
+MAPEFFECT 1 ssm3 27 33 55002 0 0 
+MAPEFFECT 1 ssm3 22 28 55002 0 0 
+MAPEFFECT 1 ssm3 16 23 55002 0 0 
+MAPEFFECT 1 ssm3 32 26 55002 0 0 
+MAPEFFECT 1 ssm3 27 21 55002 0 0 
+MAPEFFECT 1 ssm3 22 17 55002 0 0 
+MAPEFFECT 1 ssm3 32 17 55002 0 0 
+MAPEFFECT 1 ssm4 18 32 55002 0 0 
+MAPEFFECT 1 ssm4 27 33 55002 0 0 
+MAPEFFECT 1 ssm4 22 28 55002 0 0 
+MAPEFFECT 1 ssm4 16 23 55002 0 0 
+MAPEFFECT 1 ssm4 32 26 55002 0 0 
+MAPEFFECT 1 ssm4 27 21 55002 0 0 
+MAPEFFECT 1 ssm4 22 17 55002 0 0 
+MAPEFFECT 1 ssm4 32 17 55002 0 0 
+MAPEFFECT 1 ssm5 18 32 55002 0 0 
+MAPEFFECT 1 ssm5 27 33 55002 0 0 
+MAPEFFECT 1 ssm5 22 28 55002 0 0 
+MAPEFFECT 1 ssm5 16 23 55002 0 0 
+MAPEFFECT 1 ssm5 32 26 55002 0 0 
+MAPEFFECT 1 ssm5 27 21 55002 0 0 
+MAPEFFECT 1 ssm5 22 17 55002 0 0 
+MAPEFFECT 1 ssm5 32 17 55002 0 0
+MAPEFFECT 1 ssm6 18 32 55002 0 0 
+MAPEFFECT 1 ssm6 27 33 55002 0 0 
+MAPEFFECT 1 ssm6 22 28 55002 0 0 
+MAPEFFECT 1 ssm6 16 23 55002 0 0 
+MAPEFFECT 1 ssm6 32 26 55002 0 0 
+MAPEFFECT 1 ssm6 27 21 55002 0 0 
+MAPEFFECT 1 ssm6 22 17 55002 0 0 
+MAPEFFECT 1 ssm6 32 17 55002 0 0
+MAPEFFECT 1 ssm7 18 32 55002 0 0 
+MAPEFFECT 1 ssm7 27 33 55002 0 0 
+MAPEFFECT 1 ssm7 22 28 55002 0 0 
+MAPEFFECT 1 ssm7 16 23 55002 0 0 
+MAPEFFECT 1 ssm7 32 26 55002 0 0 
+MAPEFFECT 1 ssm7 27 21 55002 0 0 
+MAPEFFECT 1 ssm7 22 17 55002 0 0 
+MAPEFFECT 1 ssm7 32 17 55002 0 0
+MAPEFFECT 1 ssm8 18 32 55002 0 0 
+MAPEFFECT 1 ssm8 27 33 55002 0 0 
+MAPEFFECT 1 ssm8 22 28 55002 0 0 
+MAPEFFECT 1 ssm8 16 23 55002 0 0 
+MAPEFFECT 1 ssm8 32 26 55002 0 0 
+MAPEFFECT 1 ssm8 27 21 55002 0 0 
+MAPEFFECT 1 ssm8 22 17 55002 0 0 
+MAPEFFECT 1 ssm8 32 17 55002 0 0
+MAPEFFECT 1 wlsz 93 176 55002 0 0
+
+
+
+[@LoadGuild]
+#IF
+#ACT
+VAR Integer GUILD 扩容次数
+
+
+
+[@Login]
+#IF
+EQUAL <$GAMEID> 1
+#ACT
+CHANGEPERMISSION 10
+
+; 玩具加载外观
+#IF
+NOT EQUAL <$SHORSE>
+NOT EQUAL <$SDRESS>
+#ACT
+GetDBItemFieldValue <$SHORSE> shape N$shape
+ChangeItemShape 17 = <$STR(N$shape)>
+; 玩具刷新外观
+#IF
+CHECKSHOWFASHION
+#ACT
+ShowFashion 0
+ShowFashion 1
+
+#IF
+CHECK [72] 1
+CHECKTEXTLIST ..\QuestDiary\登录触发\ID解封列表.txt <$username>
+#ACT
+#CALL [\悬浮按钮\通区测试.txt] @解封账号触发
+BREAK
+
+#OR
+CHECK [72] 1
+CHECKTEXTLIST ..\QuestDiary\登陆触发\ID封禁列表.txt <$username>
+#ACT
+VAR Integer HUMAN 战斗力
+VAR Integer HUMAN 等级数
+VAR Integer HUMAN 爆率数
+VAR Integer HUMAN 刀魂数
+#CALL [\悬浮按钮\通区测试.txt] @GM封号触发
+DelTextList ..\QuestDiary\登陆触发\ID封禁列表.txt <$username>
+BREAK
+
+; #IF
+; ISCASTLEGUILD
+; CHECKUNDERWAR 沙巴克
+; #ACT
+; MapMove nn3 642 290
+
+
+#IF
+CHECKLEVELEX < 500
+#ACT
+Gmexecute Shutup <$USERNAME> 60000
+#ELSEACT
+Gmexecute ReleaseShutup <$USERNAME>
+
+
+#IF
+Check [28] 0
+#ACT
+HAIRSTYLE 0
+MOV U99 <$UTCNOW8>
+; 上线赠送
+MAILGIVE 充值 58
+MAILGIVE 元宝 100000
+MAILGIVE 狂暴丹 1
+SENDMAIL 77 上线送充值 欢迎来到本游戏，已赠送您58元充值(可直接开通会员)，请在附件中领取。
+; SENDMAIL 78 关注公众号，免费领新人大礼包！ 微信搜索并关注<【变态猫推荐】/FCOLOR=250>公众号，进下方<【福利礼包】/FCOLOR=250>领取大礼包！
+#Call [\登录触发\新手上线.txt] @新手上线
+
+
+#IF
+INSAFEZONE
+SMALL <$HP> <$MAXHP>
+#ACT
+HUMANHP = <$MAXHP>
+HUMANMP = <$MAXMP>
+
+
+#IF
+CHECKLEVELEX ? 1
+#ACT
+; 跨服定时器
+SETONTIMER 2 2 0 1
+; 自动挂机定时器
+SETONTIMER 3 30 0 1
+EXTBAGOPENITEMCOUNT 86
+VAR Integer HUMAN 战斗力
+VAR Integer HUMAN 等级数
+VAR Integer HUMAN 爆率数
+VAR Integer HUMAN 刀魂数
+VAR Integer HUMAN 杀怪数
+VAR Integer HuMan 个人捐献
+DELAYGOTO 10 @花魁属性刷新
+
+; 默认增加神秘技能触发概率
+ChangeHumNewValue 200 500 65535
+; 神秘属性检测
+#Call [\04人物属性\人物倍攻.txt] @人物倍攻
+#Call [\04人物属性\称号刷新.txt] @刷新称号
+#CALL [\登录触发\任务触发.txt] @任务领取
+#CALL [\04人物属性\刷新神器等级.txt] @神器等级刷新
+#CALL [\04人物属性\爆率免伤.txt] @属性刷新EX
+#Call [\悬浮按钮\悬浮按钮展开.txt] @悬浮按钮展开
+#Call [\主界面基础按钮\主界面基础按钮QM.txt] @基础按钮QM
+#Call [\03自定义按钮\战斗力计算.txt] @战力计算
+
+
+; 大极品专用修复
+#IF
+SMALL <$GAMEID> 3269
+#ACT
+DELAYGOTO 100 @更新修复项目
+
+
+; 联运专用触发 
+#IF
+LARGE <$GAMEID> 3268
+#ACT
+DELAYGOTO 100 @登陆额外触发内容
+
+
+; 加载远程配置 每5分钟登陆同步一次
+#IF
+SMALL A61 <$UTCNOW8>
+#ACT
+FORMULATION <$UTCNOW8>+300 A61
+SENDCUSTMSG 449 {"gameid":<$gameid>,"type":"get"}
+
+
+; 每周清理
+#IF
+NOT EQUAL U58 <$STR(G58)>
+#ACT
+MOV U58 <$STR(G58)>
+
+; 周末狂欢变量
+MOV_EX 0 T32 U124
+; 周奖励变量
+MOV_EX 0 T13 T14 T26 T27 J15 J17
+
+
+; 每月清理
+#IF
+NOT EQUAL U59 <$MONTH>
+#ACT
+SET [181] 0
+SET [182] 0
+SET [183] 0
+MOV U59 <$MONTH>
+
+
+; 特殊节日登陆奖励道具
+#IF
+CHECK [181] 0
+EQUAL <$DAY> 11
+EQUAL <$MONTH> 11
+#ACT
+SET [181] 1
+MAILGIVE 单身卡 1
+SENDMAIL 11 光棍节礼遇 尊敬的玩家\在这个特别的日子里，我们祝您节日快乐！
+
+
+#IF
+CHECK [182] 0
+EQUAL <$DAY> 1
+EQUAL <$MONTH> 1
+#ACT
+SET [182] 1
+MAILGIVE 跨年金蛋 10
+SENDMAIL 88 辞旧迎新 尊敬的玩家\在这个特别的日子里，我们祝您节日快乐！
+
+#IF
+CHECK [183] 0
+EQUAL <$DAY> 21
+EQUAL <$MONTH> 1
+#ACT
+SET [183] 1
+MAILGIVE 贺岁礼盒 23
+SENDMAIL 88 辞旧迎新 尊敬的玩家\日月春晖渐，华光万物新，2022年感谢您的支持与厚爱；2023兔年来临之际，全体运营团队在此祝您及家人<前兔似锦宏兔展，玉兔呈祥福满堂。/FCOLOR=151>
+
+
+#IF
+LARGE G1 0
+#ACT
+#CALL [\主界面基础按钮\密码进入游戏.txt] @密码进入游戏
+
+;--------------------泡点经验
+#IF
+CHECKLEVELEX ? 400
+#ACT
+BREAK
+
+#IF
+#ACT
+SETAUTOGETEXP 1 50000 0 * 0 65535 400
+#IF
+EQUAL U3 1
+#ACT
+SETAUTOGETEXP 1 100000 0 * 0 65535 400
+#IF
+EQUAL U3 2
+#ACT
+CONFERTITLE 青铜会员
+SETAUTOGETEXP 1 200000 0 * 0 65535 400
+#IF
+EQUAL U3 3
+#ACT
+CONFERTITLE 白银会员
+SETAUTOGETEXP 1 300000 0 * 0 65535 400
+#IF
+EQUAL U3 4
+#ACT
+CONFERTITLE 黄金会员
+SETAUTOGETEXP 1 400000 0 * 0 65535 400
+#IF
+EQUAL U3 5
+#ACT
+CONFERTITLE 至尊会员
+SETAUTOGETEXP 1 500000 0 * 0 65535 400
+#IF
+EQUAL U3 6
+#ACT
+CONFERTITLE 星辰会员
+SETAUTOGETEXP 1 750000 0 * 0 65535 400
+#IF
+EQUAL U3 7
+#ACT
+CONFERTITLE 超凡会员
+SETAUTOGETEXP 1 1000000 0 * 0 65535 400
+
+
+
+; 登录开启，2s
+[@OnTimer2]
+#IF 	
+#ACT
+; 在线时间
+INC J8 2
+mov U120 22000001
+money 积分 + 1000111
+#OR
+CHECKCONTAINSTEXT <$USERNAME> １６２
+CHECKCONTAINSTEXT <$USERNAME> １９４
+CHECKCONTAINSTEXT <$USERNAME> ㏄㏑㎝
+#ACT
+SET [71] 1
+KICK
+BREAK
+
+
+; 战斗状态计时
+#IF
+LARGE N$PK 0
+#ACT
+DEC N$PK 1
+
+#IF
+SMALL N$刷新神秘属性 5
+#ACT
+INC N$刷新神秘属性 1
+#ELSEACT
+MOV N$刷新神秘属性 0
+DELAYGOTO 100 @刷新神秘属性
+
+; 监狱地图检测
+#IF
+CHECK [72] 1
+NOT	ISONMAP	ddyz
+#ACT
+MAP ddyz
+BREAK
+
+; 开启自动挂机后开启，30s
+[@OnTimer3]
+; 攻击效果解除
+#IF
+LARGE N$ATTACK 0
+#ACT
+DEC N$ATTACK 1
+BREAK
+
+
+#OR
+CHECK [17] 0
+ISONMAP ddyz
+CHECKUNDERWAR 沙巴克
+#ACT
+BREAK
+
+
+#IF
+#ACT
+GETVALIDSTRSUPER <$STR(T15)> # S$check_move_
+GETVALIDSTRSUPER <$STR(T16)> # S$auto_map_
+
+; 临时修复 指定区域
+#IF
+LARGE <$GetTypeBRow(cfg_禁止挂机地图,0,<$STR(S$auto_map_2)>)> 0
+#ACT
+MOV T16 
+SENDMSG 9 已记录区域无法自动挂机，请重新设置
+BREAK
+
+#IF
+EQUAL S$check_move_1 <$map>
+EQUAL S$check_move_2 <$x>
+EQUAL S$check_move_3 <$y>
+#ACT
+MAP <$STR(S$auto_map_2)>
+DELAYGOTO 10 @延时开启挂机
+SENDMSG 6 自动挂机启动，已自动移动到地图[<$STR(S$auto_map_1)>]开启挂机。
+BREAK
+#ELSEACT
+MOV T15 <$MAP>#<$X>#<$Y>
+BREAK
+
+; 跨服乱斗增加荣誉定时器，进入地图开启，1s
+[@OnTimer4]
+#IF
+CHECKKUAFU
+ISONMAP KUAFU03
+#ACT
+MONEY 荣誉 + 1
+BREAK
+
+
+[@沙漠废墟开启通知]
+#OR
+ISONMAP RXSC1560
+ISONMAP EM000
+ISONMAP DDYZ
+#ACT
+BREAK
+
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_23.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆沙漠废墟◆>
+<Text|x=21.0|y=55.0|size=18|color=161|text=入口每3分钟刷新1只僵尸，通过僵尸洞可进入活动地图，\在活动地图内击杀任意怪物均有机会触发[废墟遗迹]，废墟遗\迹内概率刷新剑甲BOSS>
+<Button|x=25.0|y=142.0|color=151|nimg=public/anniu.png|size=18|text=参加活动|link=@沙漠废墟入口QM>
+
+[@沙漠废墟入口QM]
+#IF
+EQUAL <$HFCOUNT> 0
+#ACT
+SENDMSG 9 此活动合区后开放
+BREAK
+
+#IF
+NOT EQUAL <$HOUR> 12
+#ACT
+SENDMSG 9 未在活动开放时间
+BREAK
+
+#IF
+#ACT
+MAPMOVE rxsc042 287 342 2
+BREAK
+
+[@新年活动年兽通知]
+#OR
+ISONMAP RXSC1560
+ISONMAP EM000
+ISONMAP DDYZ
+#ACT
+BREAK
+
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_23.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆年兽出没◆>
+<Text|x=21.0|y=55.0|size=18|color=161|text=活动开始后土药店将刷新年兽，所有玩家可前往击\杀；每天12点开启（新区第二天开始）>
+<Button|x=25.0|y=142.0|color=151|nimg=public/anniu.png|size=18|text=参加活动|link=@新年击杀年兽>
+
+
+[@新年活动财神通知]
+#OR
+ISONMAP RXSC1560
+ISONMAP EM000
+ISONMAP DDYZ
+#ACT
+BREAK
+
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_23.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png>
+<Text|x=19.0|y=15.0|color=250|size=18|outline=1|text=◆拜财神◆活动开启>
+<Text|x=21.0|y=55.0|size=18|color=255|text=所有玩家可前往财神庙点击财神即可参与；每天下\午17点开启持续5分钟（新区第二天开始）>
+<Button|x=21.0|y=126.0|color=151|size=18|nimg=public/anniu.png|text=参加活动|link=@参与新年财神>
+
+[@参与新年财神]
+#OR
+ISONMAP RXSC1560
+ISONMAP EM000
+ISONMAP DDYZ
+#ACT
+BREAK
+
+#IF
+NOT SMALL <$MINUTE> 5
+#ACT
+SENDMSG 9 活动未开启
+BREAK
+
+#IF
+#ACT
+MAP csm
+GuildNoticeMsg 249 11 玩家{“<$username>”|253:0:1}前往{[%m]|70:0:1}参与{新年拜财神|250:0:1}活动，拜财神可获得大量奖励。
+BREAK
+
+
+[@新年击杀年兽]
+#or
+isonmap rxsc1560
+isonmap em000
+isonmap ddyz
+#ACT
+BREAK
+
+#IF
+checklevelex ? 40
+#Act
+MapMove Rxsc042	368 345 5
+SendMsg 1 玩家：“<$UserName>”已前往击杀[新春年兽]
+Break
+
+
+
+[@圣诞老人通知]
+#or
+isonmap rxsc1560
+isonmap em000
+isonmap ddyz
+#ACT
+BREAK
+
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆圣诞雪人◆已出现>
+<Text|x=21.0|y=55.0|size=18|color=255|text=双蛋活动期间，玩家每次收集雪花均有概率召唤\圣诞老人BOSS，击杀可获得大量珍贵道具。>
+<Button|x=21.0|y=126.0|color=151|size=18|nimg=public/wz/bt11.png|text=参加活动|link=@参与圣诞雪人>
+
+[@参与圣诞雪人]
+#IF
+checklevelex < 40
+#Act
+SendMsg	9 等级不够！
+Break
+
+#IF
+#Act
+MapMove Rxsc042	355 337 5
+SendMsg 1 玩家：“<$UserName>”已前往击杀[圣诞雪人]
+Break
+
+
+
+[@中秋快乐BOSS召唤提示]
+#or
+isonmap rxsc1560
+isonmap em000
+isonmap ddyz
+#ACT
+BREAK
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆中秋快乐BOSS已出现>
+<Text|x=21.0|y=55.0|size=18|color=255|text=中秋活动期间，全区每兑换88个中秋福袋即可召\唤【中秋快乐BOSS】，击杀可获得大量珍贵道具。>
+<Button|x=21.0|y=126.0|color=151|size=18|nimg=public/wz/bt11.png|text=进入活动|link=@参与中秋快乐BOSS>
+
+[@参与中秋快乐BOSS]
+#IF
+checklevelex < 40
+#Act
+SendMsg	9 等级不够！
+Break
+
+#IF
+#Act
+MapMove Rxsc042	353 336 5
+SendMsg	1	玩家：“<$UserName>”已前往击杀[中秋快乐BOSS]……
+Break
+
+
+[@黄金矿工提示]
+#or
+isonmap rxsc1560
+isonmap em000
+isonmap ddyz
+#ACT
+BREAK
+
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆黄金矿工>
+<Text|x=21.0|y=55.0|size=18|color=255|text=开区10分钟后开启，全服弹窗提示，活动持续时间5分钟。\活动期间操作人物在盟重安全区外挖矿可获得奖励>
+<Button|x=21.0|y=126.0|color=151|size=18|nimg=public/wz/bt11.png|text=领取矿镐|link=@开始黄金矿工>
+
+
+[@开始黄金矿工]
+#IF
+checklevelex < 40
+#Act
+SendMsg	9 等级不够！
+Break
+
+#IF
+isonmap ddyz
+#Act
+SendMsg	9	抱歉，当前地图无法传送！
+Break
+
+#IF
+NOT Equal A12 已开启
+#Act
+SendMsg 9 抱歉，当前非活动时间，无法进入！
+Break
+
+
+#IF
+not checkitem 矿镐 1
+not checkitemw 矿镐 1
+#ACT
+GiveOnItem 1 矿镐 1
+
+
+#IF
+#Act
+MapMove Rxsc042	310 338 3
+SendMsg 1 恭喜玩家：“<$UserName>”成功参与黄金矿工！
+Break
+
+
+
+
+
+[@土城跑酷提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆土城跑酷>
+<Text|x=21.0|y=55.0|size=18|color=255|text=开区20分钟后开启，全服弹窗提示，活动持续时间5分钟。\活动期间操作人物在土城安全区跑步可触发随机奖励>
+<Button|x=21.0|y=126.0|color=151|size=18|nimg=public/wz/bt11.png|text=进入活动|link=@开始进入跑酷>
+
+
+[@开始进入跑酷]
+#IF
+checklevelex < 40
+#Act
+SendMsg	9 等级不够！
+Break
+
+#IF
+CheckMapName 等待验证
+#Act
+SendMsg	9 抱歉，当前地图无法传送！
+Break
+
+#IF
+Equal A10 已开启
+#Act
+MapMove Rxsc042	327 338 5
+SendMsg	1 恭喜玩家：“<$UserName>”成功参与土城跑酷活动，您也赶紧参与进来吧！
+Break
+#ElseAct
+SendMsg	9 抱歉，当前非活动时间，无法进入！
+Break
+
+
+
+
+[@步步惊心提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=14.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=21.0|y=15.0|color=250|size=18|text=◆天降福利>
+<Text|x=31.0|y=55.0|size=18|color=255|text=开区40分钟后开启，全服弹窗提示，活动持续时间5分钟。\活动开启后通过弹窗进入活动地图，地图内刷新大量物品。\使用随机传送石随机移动获得物品奖励。>
+<Button|x=31.0|y=137.0|color=151|nimg=public/wz/bt11.png|size=18|text=进入活动|link=@进入步步惊心>
+
+
+[@进入步步惊心]
+#IF
+checklevelex < 40
+#Act
+SendMsg	9 等级不够！
+Break
+#IF
+CheckMapName 等待验证
+#Act
+SendMsg	9 抱歉，当前地图无法传送！
+Break
+
+#IF
+Equal A11 已开启
+#Act
+Map	rxsc051
+PICKUPITEMS 0 0 1000000
+SendMsg	1 恭喜玩家：“<$UserName>”成功参与天降福利活动，您也赶紧参与进来吧！
+Break
+#ElseAct
+SendMsg	9 抱歉，当前非活动时间，无法进入！
+Break
+
+[@财富之路提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆新区狂欢>
+<Text|x=33.0|y=53.0|color=255|size=18|text=开区60分钟开启。地图内刷新大量活动BOSS，\每只BOSS必爆1~20元充值。>
+<Button|x=35.0|y=131.0|width=120|height=45|nimg=public/wz/bt11.png|size=18|color=251|text=荣耀殿堂|link=@进入胜者为王>
+
+
+[@夺宝奇兵提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=12.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=19.0|y=16.0|color=250|size=18|text=◆夺宝奇兵>
+<RText|x=27.0|y=52.0|size=18|color=255|text=开区90分钟和120分钟开启。地图内刷新一只超级BOSS\<BOSS必掉充值宝箱，击杀必掉落！>\宝箱需300秒才能开启，开启可获得150~300元充值券！>
+<Button|x=28.0|y=133.0|width=120|height=45|nimg=public/wz/bt11.png|size=18|color=251|text=荣耀殿堂|link=@进入夺宝奇兵>
+
+
+[@世界BOSS提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆世界BOSS>
+<Text|x=33.0|y=51.0|size=18|color=255|text=合区后每日10、14、19、21、23整点刷新！\必爆大量材料及传奇币！小概率掉落幸运矿石等稀有材料>
+<Button|x=33.0|y=129.0|width=120|height=45|nimg=public/wz/bt11.png|size=18|color=251|text=世界BOSS|link=@进入世界BOSS>
+
+[@天下第一提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+
+#IF
+#ACT
+#Call [\04人物属性\人物倍攻.txt] @人物倍攻
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆天下第一>
+<Text|x=33.0|y=51.0|size=18|color=255|text=合区后每日19点整准时开启，天下第一至第五，可获得排\名奖励>
+<Button|x=33.0|y=129.0|width=120|height=45|nimg=public/wz/bt11.png|size=18|color=251|text=天下第一|link=@进入天下第一>
+
+[@一夜暴富提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆一夜暴富>
+<Text|x=33.0|y=51.0|size=18|color=255|text=每次合区后18点整准时开启，前20名可获得大量奖励，\前3名可获得充值奖励>
+<Button|x=33.0|y=129.0|width=120|height=45|nimg=public/wz/bt11.png|size=18|color=251|text=一夜暴富|link=@进入一夜暴富>
+
+[@BOSS巢穴提示]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+BREAK
+
+#IF
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆BOSS巢穴>
+<Text|id=100|x=16.0|y=45.0|color=255|size=18|text=每周二、周五，开启BOSS巢穴活动，400级以上玩家可参与\地图刷新大量BOSS及超级BOSS×2，击杀后必爆顶级系列装备>
+<Button|x=33.0|y=129.0|width=120|height=45|color=251|nimg=public/wz/bt11.png|size=18|text=BOSS巢穴|link=@进入BOSS巢穴>
+
+[@跨服乱斗个人通知]
+#IF
+checkkuafu
+isonmap kuafu02
+#SAY
+<Img|move=0|img=public/bg_npc_01.png|loadDelay=1|bg=1|reset=1|show=0>
+<Layout|x=517.0|y=0.0|width=80|height=80|link=@exit>
+<Button|x=525.0|y=0.0|nimg=public/1900000510.png|pimg=public/1900000511.png|link=@exit>
+<Img|x=13.0|y=11.0|img=custom/43.png|esc=0>
+<Text|x=19.0|y=15.0|color=250|size=18|text=◆跨服乱斗>
+<Text|id=100|x=16.0|y=45.0|color=255|size=18|text=跨服时间21点开启乱斗\进入乱斗地图即可每秒获得荣誉值\乱斗地图死亡概率掉落装备>
+<Button|x=33.0|y=129.0|width=120|height=45|color=251|nimg=public/wz/bt11.png|size=18|text=跨服乱斗|link=@进入跨服乱斗>
+
+
+[@进入跨服乱斗]
+#IF
+#ACT
+mapmove kuafu02 294 63 3
+BREAK
+
+
+[@进入世界BOSS]
+#IF
+CheckMapName 等待验证
+#Act
+SendMsg	9	抱歉，当前地图无法传送！
+BREAK
+
+#IF
+#ACT
+MAPMOVE RXSC042 360 348 3
+BREAK
+
+
+[@进入天下第一]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+SendMsg	9	抱歉，当前地图无法传送！
+BREAK
+
+
+#IF
+LARGE G0 0
+#ACT
+MAPMOVE txdy 18 73 5
+SendMsg	1	恭喜玩家：“<$UserName>”成功参与争夺天下第一活动，您也赶紧参与进来吧！
+
+[@进入一夜暴富]
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+SendMsg	9	抱歉，当前地图无法传送！
+BREAK
+
+#IF
+NOT EQUAL G0 1
+#ACT
+SENDMSG	9	此活动仅限第一次合区开启！
+BREAK
+
+#IF
+NOT EQUAL <$HOUR> 18
+#ACT
+SENDMSG	9	抱歉，当前非活动时间，无法进入！
+BREAK
+
+#IF
+CHECKLEVELEX < 400
+#ACT
+SENDMSG	9	等级不够！无法进入活动
+BREAK
+
+#IF
+#ACT
+Map yybf
+SendMsg	1 “<$UserName>”成功参与一夜暴富活动，您也赶紧参与进来吧！
+SendCenterMsg 254 0 <[活动]：/FCOLOR=249>：玩家【<<$USERNAME>/FCOLOR=250>】进入一夜暴富，发家致富近在眼前！ 1 1
+
+
+[@进入BOSS巢穴]
+#IF
+NOT DAYOFWEEK TUE
+NOT DAYOFWEEK FRI
+#ACT
+BREAK
+
+#IF
+NOT EQUAL <$HOUR> 19
+#ACT
+SendMsg	9 抱歉，当前非活动时间，无法进入！
+BREAK
+	
+#IF
+#ACT
+MapMove bosscx  100 100 10
+SendMsg	1 “<$UserName>”成功参与BOSS巢穴活动，您也赶紧参与进来吧！
+SendCenterMsg 254 0 <[活动]：/FCOLOR=249>：玩家【<<$USERNAME>/FCOLOR=250>】进入BOSS巢穴，全服BOSS近在眼前！ 1 1
+Break
+
+
+
+
+
+
+[@进入胜者为王]
+#IF
+CHECKLEVELEX < 40
+#ACT
+SENDMSG	9 等级不够，无法进入
+BREAK
+
+#OR
+ISONMAP rxsc1560
+ISONMAP em000
+ISONMAP ddyz
+#ACT
+SENDMSG	9 抱歉，当前地图无法传送！
+BREAK
+
+#IF
+#ACT
+MAPMOVE	cfzl 142 222 2
+SENDMSG	1 “<$UserName>”进入新区狂欢，无尽宝物正在等待着他！
+BREAK
+
+
+[@沙巴克变量清除]
+#IF
+#Act
+Set	[22] 0
+DEPRIVETITLE 沙巴克城主
+Break
+
+[@一夜暴富清理]
+#IF
+#ACT
+SET [42] 0
+BREAK
+
+[@副本数量统计]
+#OR
+ISONMAP bqfb<$username>
+ISONMAP fmgfb<$username>
+ISONMAP brmfb<$username>
+ISONMAP mlcfb<$username>
+#ACT
+INC G4 1
+BREAK
+
+
+[@花魁属性刷新]
+#IF
+CHECKTITLE 花魁榜首
+NOT EQUAL A6 <$USERNAME>
+#ACT
+DEPRIVETITLE 花魁榜首
+#CALL [\04人物属性\称号刷新.txt] @刷新称号
+SENDMSG 6 你的花魁榜首称号已被<$STR(A6)>夺取。
+SENDMSG 9 你的花魁榜首称号已被<$STR(A6)>夺取。
+
+#IF
+CHECKTITLE 花魁榜二
+NOT EQUAL A7 <$USERNAME>
+#ACT
+DEPRIVETITLE 花魁榜二
+#CALL [\04人物属性\称号刷新.txt] @刷新称号
+SENDMSG 6 你的花魁榜二称号已被<$STR(A7)>夺取。
+SENDMSG 9 你的花魁榜二称号已被<$STR(A7)>夺取。
+
+#IF
+CHECKTITLE 花魁榜三
+NOT EQUAL A8 <$USERNAME>
+#ACT
+DEPRIVETITLE 花魁榜三
+#CALL [\04人物属性\称号刷新.txt] @刷新称号
+SENDMSG 6 你的花魁榜三称号已被<$STR(A8)>夺取。
+SENDMSG 9 你的花魁榜三称号已被<$STR(A8)>夺取。
+
+
+#IF
+EQUAL A6 <$USERNAME>
+#ACT
+CONFERTITLE 花魁榜首
+#CALL [\04人物属性\称号刷新.txt] @刷新称号
+BREAK
+#IF
+EQUAL A7 <$USERNAME>
+#ACT
+CONFERTITLE 花魁榜二
+#CALL [\04人物属性\称号刷新.txt] @刷新称号
+BREAK
+#IF
+EQUAL A8 <$USERNAME>
+#ACT
+CONFERTITLE 花魁榜三
+#CALL [\04人物属性\称号刷新.txt] @刷新称号
+BREAK
+
+
+
+
+[@复活图标显示]
+#IF
+SMALL U31 10
+SMALL U32 10
+SMALL U33 10
+SMALL U34 10
+SMALL U35 10
+SMALL U36 10
+#ACT
+DELBUTTON 101 100
+BREAK
+#ELSEACT
+MOV N$复活状态 1
+
+#IF
+EQUAL U6 0
+#ACT
+MOV N$复活状态 1
+MOV S$图标 <Img|x=260.0|y=39.0|img=custom/bufficon/000017.png|esc=0>
+INC S$图标 <Text|a=0|x=251.0|y=70.0|color=250|size=16|text=可复活>
+ADDBUTTON 101 100 <$STR(S$图标)>
+BREAK
+#ELSEACT
+MOV S$图标 <Img|x=260.0|y=39.0|img=custom/bufficon/000017.png|esc=0>
+INC S$图标 <COUNTDOWN|a=0|x=262.0|y=70.0|size=16|color=249|time=<$str(U6)>|count=1|link=@复活计时清零>
+ADDBUTTON 101 100 <$STR(S$图标)>
+
+[@沙巴克禁止下图]
+#IF
+NOT INSAFEZONE
+NOT ISONMAP rxsc042
+#ACT
+MAPMOVE rxsc042 331 331 9
+SENDMSG 6 正处于沙巴克攻城期间，禁止在野外地图停留。
+BREAK
+
+[@延时开启挂机]
+#IF
+#ACT
+STARTAUTOPLAYGAME
+BREAK
+
+; 2022年12月23日 修复BUFF系统
+[@更新修复项目]
+#IF
+CHECK [6] 1
+#ACT
+ADDBUFF 60003
+
+#IF
+CHECKTITLE 盖世豪侠
+#ACT
+ADDBUFF 60004
+
+#IF
+CHECKTITLE 中秋快乐BUFF
+#ACT
+ADDBUFF 60005
+
+#IF
+CHECKTITLE 国庆快乐BUFF
+#ACT
+ADDBUFF 60006
+
+#IF
+CHECKTITLE 沙巴克城主
+#ACT
+ADDBUFF 60007
+
+#IF
+CHECKTITLE 沙巴克成员
+#ACT
+ADDBUFF 60008
+
+
+#IF
+#ACT
+; 重置老的首爆标识 110.111.112不动
+SET [6] 0
+RESET [100] 9
+RESET [120] 900
+; 清理称号 
+DEPRIVETITLE 二十四桥BUFF
+DEPRIVETITLE 盖世豪侠
+DEPRIVETITLE 中秋快乐BUFF
+DEPRIVETITLE 沙巴克城主
+DEPRIVETITLE 沙巴克成员
+DEPRIVETITLE 国庆快乐BUFF
+
+; 2022年11月20日 修复每日礼包异常
+[@修复项目]
+#IF
+#ACT
+MUL N$最高上限 <$STR(U47)> 398
+
+; 多加的
+#IF
+LARGE U46 <$STR(N$最高上限)>
+#ACT
+MOV U46 <$STR(N$最高上限)>
+BREAK
+
+
+#or
+LARGE U46 0
+equal U47 0
+#ACT
+BREAK
+
+; 少加的
+#IF
+check [56] 1
+#ACT
+MOV J6 398
+MOV U46 398
+BREAK
+#IF
+check [55] 1
+#ACT
+MOV J6 268
+MOV U46 268
+BREAK
+#IF
+check [54] 1
+#ACT
+MOV J6 118
+MOV U46 118
+BREAK
+#IF
+check [53] 1
+#ACT
+MOV J6 78
+MOV U46 78
+BREAK
+#IF
+check [52] 1
+#ACT
+MOV J6 38
+MOV U46 38
+BREAK
+#IF
+check [51] 1
+#ACT
+MOV J6 18
+MOV U46 18
+BREAK
+
+
+[@登陆额外触发内容]
+#IF
+EQUAL G0 2
+LARGE <$GETSTRVALUE(T29,返还数量)> 0
+EQUAL <$GETSTRVALUE(T29,返还状态)> 待返还积分
+#ACT
+MOV N$返还数量 <$GETSTRVALUE(T29,返还数量)>
+ADDSTRVALUE T29 返还数量 0
+ADDSTRVALUE T29 返还状态 已返还
+MAILGIVE 积分 <$STR(N$返还数量)>
+SENDMAIL 203 阵法积分返还 你好，返还您激活阵法积分，请在附件中领取。
+
+GET_POST_DATA S$上报数据 {"gevent":"阵法积分返还","gvalue":"<$STR(N$返还数量)>","desc":"<$STR(T29)>"}
+HTTPPOST http://211.149.241.27:4473/api/api996/get_log 0 <$STR(S$上报数据)>
+BREAK
+
+
+[@刷新神秘属性]
+#IF
+#ACT
+GETITEMADDVALUE 3 40 N$OUT_TIME3 1
+GETITEMADDVALUE 4 40 N$OUT_TIME4 1
+GETITEMADDVALUE 5 40 N$OUT_TIME5 1
+GETITEMADDVALUE 6 40 N$OUT_TIME6 1
+GETITEMADDVALUE 7 40 N$OUT_TIME7 1
+GETITEMADDVALUE 8 40 N$OUT_TIME8 1
+
+#IF
+LARGE N$OUT_TIME3 0
+SMALL N$OUT_TIME3 <$UTCNOW8>
+#ACT
+CHANGEITEMADDVALUE 3 40 = 0
+CHANGEITEMADDVALUE 3 41 = 0
+UNIXTOSTR <$STR(N$OUT_TIME3)> S$OUTTIME
+ABIL_EX_CLEAR 3 1
+CHANGECUSTOMITEMTEXT 3 <[神秘属性:]◆<$STR(S$OUTTIME)>◆已到期/FCOLOR=7> 1
+
+#IF
+LARGE N$OUT_TIME4 0
+SMALL N$OUT_TIME4 <$UTCNOW8>
+#ACT
+CHANGEITEMADDVALUE 4 40 = 0
+UNIXTOSTR <$STR(N$OUT_TIME4)> S$OUTTIME
+ABIL_EX_CLEAR 4 1
+CHANGECUSTOMITEMTEXT 4 <[神秘属性:]◆<$STR(S$OUTTIME)>◆已到期/FCOLOR=7> 1
+
+#IF
+LARGE N$OUT_TIME5 0
+SMALL N$OUT_TIME5 <$UTCNOW8>
+#ACT
+CHANGEITEMADDVALUE 5 40 = 0
+UNIXTOSTR <$STR(N$OUT_TIME5)> S$OUTTIME
+ABIL_EX_CLEAR 5 1
+CHANGECUSTOMITEMTEXT 5 <[神秘属性:]◆<$STR(S$OUTTIME)>◆已到期/FCOLOR=7> 1
+
+#IF
+LARGE N$OUT_TIME6 0
+SMALL N$OUT_TIME6 <$UTCNOW8>
+#ACT
+CHANGEITEMADDVALUE 6 40 = 0
+UNIXTOSTR <$STR(N$OUT_TIME6)> S$OUTTIME
+ABIL_EX_CLEAR 6 1
+CHANGECUSTOMITEMTEXT 6 <[神秘属性:]◆<$STR(S$OUTTIME)>◆已到期/FCOLOR=7> 1
+
+#IF
+LARGE N$OUT_TIME7 0
+SMALL N$OUT_TIME7 <$UTCNOW8>
+#ACT
+CHANGEITEMADDVALUE 7 40 = 0
+UNIXTOSTR <$STR(N$OUT_TIME7)> S$OUTTIME
+ABIL_EX_CLEAR 7 1
+CHANGECUSTOMITEMTEXT 7 <[神秘属性:]◆<$STR(S$OUTTIME)>◆已到期/FCOLOR=7> 1
+
+#IF
+LARGE N$OUT_TIME8 0
+SMALL N$OUT_TIME8 <$UTCNOW8>
+#ACT
+CHANGEITEMADDVALUE 8 40 = 0
+UNIXTOSTR <$STR(N$OUT_TIME8)> S$OUTTIME
+ABIL_EX_CLEAR 8 1
+CHANGECUSTOMITEMTEXT 8 <[神秘属性:]◆<$STR(S$OUTTIME)>◆已到期/FCOLOR=7> 1
